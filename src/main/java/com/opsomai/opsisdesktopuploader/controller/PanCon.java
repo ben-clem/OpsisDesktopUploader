@@ -10,6 +10,10 @@ public abstract class PanCon {
     ///////////////
     protected boolean needRefresh = false;
     protected String refreshType;
+    
+    protected String url;
+    protected String api;
+    protected String nom;
 
     ///////////////////////
     // GETTERS / SETTERS //
@@ -20,6 +24,18 @@ public abstract class PanCon {
 
     public String getRefreshType() {
         return this.refreshType;
+    }
+    
+    public String getName() {
+        return this.nom;
+    }
+
+    public String getUrl() {
+        return this.url;
+    }
+
+    public String getApiKey() {
+        return this.api;
     }
 
 }

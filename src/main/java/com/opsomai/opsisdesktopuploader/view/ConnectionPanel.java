@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
 import javax.imageio.ImageIO;
-import javax.swing.border.CompoundBorder;
 
 /**
  * Ecran de connexion
@@ -83,12 +82,12 @@ public final class ConnectionPanel extends JPanel {
         col1 = new JPanel();
         col1.setLayout(new BoxLayout(col1, BoxLayout.PAGE_AXIS));
 
-        JLabel urlLabel = new JLabel("URL de la médiathèque :");
+        JLabel urlLabel = new JLabel("URL de la médiathèque* :");
         urlLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         urlLabel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         col1.add(urlLabel);
 
-        JLabel apiLabel = new JLabel("Clé API utilisateur :");
+        JLabel apiLabel = new JLabel("Clé API utilisateur* :");
         apiLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
         apiLabel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         col1.add(apiLabel);
@@ -159,6 +158,39 @@ public final class ConnectionPanel extends JPanel {
 
     }
 
+    /**
+     * simple popup
+     *
+     * @param message
+     */
+    public void popup(String message) {
+
+        JOptionPane.showMessageDialog(this, message, "Message", JOptionPane.PLAIN_MESSAGE);
+
+    }
+
+    /**
+     * Warning popup
+     *
+     * @param message
+     */
+    public void popupWarning(String message) {
+
+        JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);
+
+    }
+
+    /**
+     * Error popup
+     *
+     * @param message
+     */
+    public void popupError(String message) {
+
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+
+    }
+    
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
@@ -190,3 +222,10 @@ public final class ConnectionPanel extends JPanel {
     }
 
 }
+
+
+
+
+
+
+

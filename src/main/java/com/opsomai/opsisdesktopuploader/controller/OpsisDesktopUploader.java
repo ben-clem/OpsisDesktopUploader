@@ -1,6 +1,7 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
+import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import com.opsomai.opsisdesktopuploader.view.Window;
 import java.time.ZonedDateTime;
 import javax.swing.UIDefaults;
@@ -60,14 +61,14 @@ public class OpsisDesktopUploader {
         winCon.win.setVisible(true);
 
         // Starting update loop
-        winCon.updateLoop(conPanCon);
+        winCon.updateLoop(winCon, conPanCon);
 
     }
 
     /**
      * update loop
      */
-    private synchronized void updateLoop(PanCon panCon) {
+    private synchronized void updateLoop(OpsisDesktopUploader winCon, PanCon panCon) {
 
         while (true) { // while app is running
 
@@ -90,8 +91,17 @@ public class OpsisDesktopUploader {
                 
                 switch (refreshType) {
 
-                    case "":
+                    case "connection":
 
+                        UploadPanel uploadPanel = new UploadPanel(panCon.getName(), panCon.getUrl());
+                        
+                        UplPanCon uplPanCon = new UplPanCon(uploadPanel);
+                        
+                        winCon.win.setContentPane(uploadPanel);
+                        winCon.win.setVisible(true);
+                        
+                        panCon = uplPanCon;
+                        
                         break;
 
 //                    case "":
