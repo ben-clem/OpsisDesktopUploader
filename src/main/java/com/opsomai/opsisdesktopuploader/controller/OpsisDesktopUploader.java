@@ -17,9 +17,11 @@ public class OpsisDesktopUploader {
     // ATTRIBUTS //
     ///////////////
     private Window win;
-    
+
     private Boolean needRefresh;
     private String refreshType;
+    
+    private UploadPanel uploadPanel;
 
     //////////////
     // METHODES //
@@ -37,7 +39,7 @@ public class OpsisDesktopUploader {
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
             e.printStackTrace(System.err);
         }
-        
+
         // Sets the buttons press key to enter
         UIManager.put("Button.focusInputMap", new UIDefaults.LazyInputMap(new Object[]{
             "ENTER", "pressed",
@@ -88,26 +90,30 @@ public class OpsisDesktopUploader {
                 System.out.println("-- needRefresh = " + needRefresh);
                 System.out.println("-- updating at " + ZonedDateTime.now());
                 System.out.println("-- refreshType = " + refreshType);
-                
+
                 switch (refreshType) {
 
-                    case "connection":
+                    case "loadUploadPanel":
 
-                        UploadPanel uploadPanel = new UploadPanel(panCon.getName(), panCon.getUrl());
-                        
+                        uploadPanel = new UploadPanel(panCon.getName(), panCon.getUrl());
+
                         UplPanCon uplPanCon = new UplPanCon(uploadPanel);
+
+                        winCon.win.setContentPane(uploadPanel);
+                        winCon.win.setVisible(true);
+
+                        panCon = uplPanCon;
+
+                        break;
+
+                    case "reloadUploadPanel":
                         
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
                         
-                        panCon = uplPanCon;
+                        panCon.setNeedRefresh(false);
                         
                         break;
-
-//                    case "":
-//
-//                       
-//                        break;
 //
 //                    case "":
 //
@@ -127,7 +133,6 @@ public class OpsisDesktopUploader {
 
                 // updating controller
 //                currentUser = panCon.getCurrentUser();
-
             }
         }
 

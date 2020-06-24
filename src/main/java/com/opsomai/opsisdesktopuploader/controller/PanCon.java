@@ -21,9 +21,17 @@ public abstract class PanCon {
     public boolean getNeedRefresh() {
         return this.needRefresh;
     }
+    
+    public void setNeedRefresh(Boolean b) {
+        needRefresh = b;
+    }
 
     public String getRefreshType() {
         return this.refreshType;
+    }
+    
+    public void setRefreshType(String s) {
+        refreshType = s;
     }
     
     public String getName() {

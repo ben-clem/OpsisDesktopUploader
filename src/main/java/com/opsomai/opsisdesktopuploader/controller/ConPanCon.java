@@ -91,7 +91,7 @@ public class ConPanCon extends PanCon {
 
             // Set needRefresh and refreshType
             needRefresh = true;
-            refreshType = "connection";
+            refreshType = "loadUploadPanel";
         }
 
     }

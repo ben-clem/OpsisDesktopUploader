@@ -5,13 +5,23 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.openide.util.Exceptions;
 
 /**
  * Upload Screen
@@ -26,6 +36,9 @@ public final class UploadPanel extends JPanel {
 
     private Color bg = new Color(255, 255, 255);
     private Color fg = new Color(220, 0, 0);
+
+    private JButton openButton;
+    private JPanel filesPanel;
 
     //////////////
     // METHODES //
@@ -51,8 +64,23 @@ public final class UploadPanel extends JPanel {
         choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.LINE_AXIS));
         choicePanel.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.BLACK));
 
+        choicePanel.add(Box.createRigidArea(new Dimension(5, 0)));
+
         JLabel lab1 = new JLabel("Choisir des fichiers : ");
         choicePanel.add(lab1);
+
+        try {
+            // File Chooser
+            openButton = new JButton("Select files...",
+                    createImageIcon("img/Open16.gif"));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
+        choicePanel.add(openButton);
+        
+        JLabel lab2 = new JLabel(" ou les glisser-déposer en dessous :");
+        choicePanel.add(lab2);
 
         // files uploader
         // adding choice Panel
@@ -61,13 +89,13 @@ public final class UploadPanel extends JPanel {
         c2.gridx = 0;
         c2.gridy = 1;
         c2.gridwidth = 3;
-        c2.weighty = 0.1;
+        c2.weighty = 0.08;
         c2.insets = new Insets(0, 5, 0, 5);
         c2.anchor = GridBagConstraints.PAGE_START;
         this.add(choicePanel, c2);
 
         // upload panel
-        JPanel filesPanel = new JPanel();
+        filesPanel = new JPanel();
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
 
         filesPanel.setBackground(fg);
@@ -113,7 +141,51 @@ public final class UploadPanel extends JPanel {
         this.add(cancel, c5);
     }
 
+    public void showMedias(ArrayList<File> medias) {
+        for (File f : medias) {
+            JLabel m = new JLabel(f.toString());
+            filesPanel.add(m);
+            System.out.println("-- trying to add a media to the filesPanel");
+        }
+    }
+    
+    /**
+     * Returns an ImageIcon, or null if the path was invalid.
+     *
+     * @param path
+     * @return
+     * @throws java.io.FileNotFoundException
+     */
+    protected static ImageIcon createImageIcon(String path) throws FileNotFoundException, IOException {
+        Image img = ImageIO.read(new FileInputStream(path));
+        img = img.getScaledInstance(-1, 16, Image.SCALE_SMOOTH);
+        ImageIcon logo = new ImageIcon(img);
+        if (img != null) {
+            return logo;
+        } else {
+            System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
+    
+    /**
+     * adds an ActionListener to the open button
+     *
+     * @param listenForOpenButton ActionListener added by the controller
+     */
+    public void addOpenButtonListener(ActionListener listenForOpenButton) {
+
+        openButton.addActionListener(listenForOpenButton);
+
+    }
+
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
+    /**
+     * @return the open button
+     */
+    public JButton getOpenButton() {
+        return openButton;
+    }
 }
