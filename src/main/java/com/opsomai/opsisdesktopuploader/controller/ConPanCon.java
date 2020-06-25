@@ -21,7 +21,6 @@ public class ConPanCon extends PanCon {
     ///////////////
     protected ConnectionPanel theView;
 
-
     //////////////////////
     // ACTION LISTENERS //
     //////////////////////
@@ -67,26 +66,6 @@ public class ConPanCon extends PanCon {
                     e.printStackTrace(System.err);
                 }
 
-                // JSON reader test --> Good mais pas ici
-                JSONParser parser = new JSONParser();
-
-                try (Reader reader = new FileReader("connection-info.json")) {
-
-                    JSONObject jsonObject = (JSONObject) parser.parse(reader);
-                    System.out.println(jsonObject);
-
-                    String readUrl = (String) jsonObject.get("url");
-                    System.out.println("readUrl = " + readUrl);
-
-                    String readApiKey = (String) jsonObject.get("api-key");
-                    System.out.println("readApiKey = " + readApiKey);
-
-                    String readName = (String) jsonObject.get("name");
-                    System.out.println("readName = " + readName);
-
-                } catch (org.json.simple.parser.ParseException | IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
             }
 
             // Set needRefresh and refreshType
@@ -106,10 +85,56 @@ public class ConPanCon extends PanCon {
      */
     public ConPanCon(ConnectionPanel theView) {
 
-        this.theView = theView;
+        String readUrl;
+        String readApiKey;
+        String readName;
 
-        // Connecting the action listener to the view
-        this.theView.addConnButtonListener(new ConnButtonListener());
+        // JSON reader
+        JSONParser parser = new JSONParser();
+
+        try (Reader reader = new FileReader("connection-info.json")) {
+
+            if (reader.ready()) {
+                JSONObject jsonObject = (JSONObject) parser.parse(reader);
+                System.out.println(jsonObject);
+
+                readUrl = (String) jsonObject.get("url");
+                System.out.println("readUrl = " + readUrl);
+
+                readApiKey = (String) jsonObject.get("api-key");
+                System.out.println("readApiKey = " + readApiKey);
+
+                readName = (String) jsonObject.get("name");
+                System.out.println("readName = " + readName);
+
+                if (readUrl.isEmpty() || readApiKey.isEmpty()) {
+
+                    this.theView = theView;
+
+                    // Connecting the action listener to the view
+                    this.theView.addConnButtonListener(new ConnButtonListener());
+
+                } else {
+
+                    url = readUrl;
+                    api = readApiKey;
+                    nom = readName;
+
+                    // Set needRefresh and refreshType
+                    needRefresh = true;
+                    refreshType = "loadUploadPanel";
+                }
+            } else {
+                System.out.println("-- connection-info.json is empty");
+                
+                this.theView = theView;
+                // Connecting the action listener to the view
+                this.theView.addConnButtonListener(new ConnButtonListener());
+            }
+
+        } catch (org.json.simple.parser.ParseException | IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
 
     }
 

@@ -3,10 +3,16 @@ package com.opsomai.opsisdesktopuploader.controller;
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import com.opsomai.opsisdesktopuploader.view.Window;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.time.ZonedDateTime;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.openide.util.Exceptions;
 
 /**
  * Controller de la fenêtre
@@ -20,7 +26,7 @@ public class OpsisDesktopUploader {
 
     private Boolean needRefresh;
     private String refreshType;
-    
+
     private UploadPanel uploadPanel;
 
     //////////////
@@ -54,13 +60,41 @@ public class OpsisDesktopUploader {
 
         // Creating the first view
         ConnectionPanel conPan = new ConnectionPanel();
-        winCon.win.setContentPane(conPan);
+
+        // JSON reader
+        JSONParser parser = new JSONParser();
+
+        try (Reader reader = new FileReader("connection-info.json")) {
+
+            if (reader.ready()) {
+                JSONObject jsonObject = (JSONObject) parser.parse(reader);
+                System.out.println(jsonObject);
+
+                String readUrl = (String) jsonObject.get("url");
+                System.out.println("readUrl = " + readUrl);
+
+                String readApiKey = (String) jsonObject.get("api-key");
+                System.out.println("readApiKey = " + readApiKey);
+
+                if (readUrl.isEmpty() || readApiKey.isEmpty()) {
+
+                    // Showing
+                    winCon.win.setContentPane(conPan);
+                    winCon.win.setVisible(true);
+
+                }
+            } else {
+                // Showing
+                winCon.win.setContentPane(conPan);
+                winCon.win.setVisible(true);
+            }
+
+        } catch (org.json.simple.parser.ParseException | IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
 
         // Creating its controller
         ConPanCon conPanCon = new ConPanCon(conPan);
-
-        // Showing
-        winCon.win.setVisible(true);
 
         // Starting update loop
         winCon.updateLoop(winCon, conPanCon);
@@ -107,24 +141,25 @@ public class OpsisDesktopUploader {
                         break;
 
                     case "reloadUploadPanel":
-                        
+
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
-                        
+
                         panCon.setNeedRefresh(false);
-                        
+
                         break;
-//
-//                    case "":
-//
-//                       
-//                        break;
-//
-//                    case "":
-//
-//                       
-//                        break;
-//
+
+                    case "loadConnectionPanel":
+
+                        ConnectionPanel conPan = new ConnectionPanel();
+                        ConPanCon conPanCon = new ConPanCon(conPan);
+                        winCon.win.setContentPane(conPan);
+                        winCon.win.setVisible(true);
+
+                        panCon = conPanCon;
+
+                        break;
+
 //                    case "":
 //
 //                      

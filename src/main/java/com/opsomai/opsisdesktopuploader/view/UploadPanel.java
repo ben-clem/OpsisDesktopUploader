@@ -37,6 +37,7 @@ public final class UploadPanel extends JPanel {
     private Color bg = new Color(255, 255, 255);
     private Color fg = new Color(220, 0, 0);
 
+    private JButton deco;
     private JButton openButton;
     private JPanel filesPanel;
 
@@ -49,16 +50,34 @@ public final class UploadPanel extends JPanel {
         setBackground(bg);
         setLayout(new GridBagLayout());
 
+        Component box2 = Box.createHorizontalStrut(1);
+        GridBagConstraints c7 = new GridBagConstraints();
+        c7.fill = GridBagConstraints.BOTH;
+        c7.gridx = 0;
+        c7.gridy = 0;
+        c7.weightx = 0.3;
+        this.add(box2, c7);
+        
         JLabel topLabel = new JLabel("Connecté à la médiathèque : " + name + " (" + url + ")");
         GridBagConstraints c1 = new GridBagConstraints();
         //c1.fill = GridBagConstraints.HORIZONTAL;
-        c1.gridx = 0;
+        c1.gridx = 1;
         c1.gridy = 0;
-        c1.gridwidth = 3;
+        c1.gridwidth = 1;
+        c1.weightx = 0.5;
         c1.weighty = 0.02;
         c1.insets = new Insets(5, 5, 0, 5);
         c1.anchor = GridBagConstraints.CENTER;
         this.add(topLabel, c1);
+        
+        deco = new JButton("Déconnexion");
+        GridBagConstraints c8 = new GridBagConstraints();
+        c8.gridx = 2;
+        c8.gridy = 0;
+        c8.weightx = 0;
+        c8.insets = new Insets(5, 5, 5, 5);
+        c8.anchor  = GridBagConstraints.LINE_END;
+        this.add(deco, c8);
 
         JPanel choicePanel = new JPanel();
         choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.LINE_AXIS));
@@ -176,6 +195,17 @@ public final class UploadPanel extends JPanel {
     public void addOpenButtonListener(ActionListener listenForOpenButton) {
 
         openButton.addActionListener(listenForOpenButton);
+
+    }
+    
+    /**
+     * adds an ActionListener to the deco button
+     *
+     * @param listenForDecoButton ActionListener added by the controller
+     */
+    public void addDecoButtonListener(ActionListener listenForDecoButton) {
+
+        deco.addActionListener(listenForDecoButton);
 
     }
 

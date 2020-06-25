@@ -5,9 +5,12 @@ import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
+import org.openide.util.Exceptions;
 
 /**
  * Upload Panel Controller
@@ -24,7 +27,7 @@ public class UplPanCon extends PanCon {
     // ACTION LISTENERS //
     //////////////////////
     /**
-     * Implementation of the ope button listener
+     * Implementation of the open button listener
      */
     class OpenButtonListener implements ActionListener {
 
@@ -78,6 +81,27 @@ public class UplPanCon extends PanCon {
 
         }
     }
+    
+    /**
+     * Implementation of the deco button listener
+     */
+    class DecoButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            try {
+                // clear JSON file
+                new FileWriter("connection-info.json", false).close();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            
+            needRefresh = true;
+            refreshType = "loadConnectionPanel";
+
+        }
+    }
 
     //////////////
     // METHODES //
@@ -94,6 +118,7 @@ public class UplPanCon extends PanCon {
 
         // Connecting action listeners
         this.theView.addOpenButtonListener(new OpenButtonListener());
+        this.theView.addDecoButtonListener(new DecoButtonListener());
 
     }
 
