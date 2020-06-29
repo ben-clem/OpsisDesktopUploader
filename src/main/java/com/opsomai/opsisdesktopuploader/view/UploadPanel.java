@@ -126,7 +126,7 @@ public final class UploadPanel extends JPanel {
         filesPanel = new JPanel();
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
         filesPanel.setBackground(fg);
-        
+
         JScrollPane scrollPane = new JScrollPane(filesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
@@ -172,44 +172,45 @@ public final class UploadPanel extends JPanel {
 
     public void displayMediasInfo(ArrayList<Media> medias) {
 
+        filesPanel.removeAll();
+        
         medias.stream().forEachOrdered(media -> {
-            
-            filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-            
+
+            if (media.getIndex() == 0) {
+                filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+            }
+
             JPanel eachFilePanel = new JPanel();
             eachFilePanel.setLayout(new BoxLayout(eachFilePanel, BoxLayout.LINE_AXIS));
 
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
-            
+
             // Thumbnail loading icon (while separate thread is loading actual thumbnail)
-            
             ImageIcon loading = new ImageIcon("img/ajax-loader.gif");
             final JLabel loadingLabel = new JLabel(loading, JLabel.CENTER);
-            
+            loadingLabel.setMinimumSize(new Dimension(100, 100));
+            loadingLabel.setPreferredSize(new Dimension(100, 100));
+            loadingLabel.setMaximumSize(new Dimension(100, 100));
+
             thumbnailsMap.put(media.getIndex(), loadingLabel);
+            System.out.println("** adding to thumbnailsMap : " + media.getIndex());
+
             eachFilePanel.add(loadingLabel);
 
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
-            
+
             // Title
-            
-            
-            
             eachFilePanel.add(Box.createHorizontalGlue());
-            
+
             // Progress Bar
-            
-            
             // Cancel Button
-            
-            
             // Adding eachFilePanel to filesPanel
             filesPanel.add(eachFilePanel);
             
-            
+            filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
         }
         );
-        
 
     }
 
