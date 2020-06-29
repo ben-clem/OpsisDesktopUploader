@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.apache.log4j.BasicConfigurator;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openide.util.Exceptions;
@@ -51,6 +52,9 @@ public class OpsisDesktopUploader {
             "ENTER", "pressed",
             "released ENTER", "released"
         }));
+        
+        // Configure log4j for MIME type checking with JMimeType (ditched because too slow)
+        // BasicConfigurator.configure();
 
         // Instanciating the controller
         OpsisDesktopUploader winCon = new OpsisDesktopUploader();

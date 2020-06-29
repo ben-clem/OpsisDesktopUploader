@@ -8,10 +8,13 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -22,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
+import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Upload Screen
@@ -57,7 +61,7 @@ public final class UploadPanel extends JPanel {
         c7.gridy = 0;
         c7.weightx = 0.3;
         this.add(box2, c7);
-        
+
         JLabel topLabel = new JLabel("Connecté à la médiathèque : " + name + " (" + url + ")");
         GridBagConstraints c1 = new GridBagConstraints();
         //c1.fill = GridBagConstraints.HORIZONTAL;
@@ -69,14 +73,14 @@ public final class UploadPanel extends JPanel {
         c1.insets = new Insets(5, 5, 0, 5);
         c1.anchor = GridBagConstraints.CENTER;
         this.add(topLabel, c1);
-        
+
         deco = new JButton("Déconnexion");
         GridBagConstraints c8 = new GridBagConstraints();
         c8.gridx = 2;
         c8.gridy = 0;
         c8.weightx = 0;
         c8.insets = new Insets(5, 5, 5, 5);
-        c8.anchor  = GridBagConstraints.LINE_END;
+        c8.anchor = GridBagConstraints.LINE_END;
         this.add(deco, c8);
 
         JPanel choicePanel = new JPanel();
@@ -97,7 +101,7 @@ public final class UploadPanel extends JPanel {
         }
 
         choicePanel.add(openButton);
-        
+
         JLabel lab2 = new JLabel(" ou les glisser-déposer en dessous :");
         choicePanel.add(lab2);
 
@@ -161,13 +165,85 @@ public final class UploadPanel extends JPanel {
     }
 
     public void showMedias(ArrayList<File> medias) {
-        for (File f : medias) {
-            JLabel m = new JLabel(f.toString());
+
+        ImageIO.setUseCache(false);
+        
+        medias.stream().forEach((media) -> {
+
+            System.out.println("-beginning working on: " + media.getName());
+            LocalDateTime beginDate = LocalDateTime.now();
+
+            Image newImg = null;
+
+            // Media Display
+            // Getting the thumbnail
+            // If it's an image: scale it
+//
+//  Solution using MIME type checking in the file header with JMimeMagic
+//  more secure because it prevents file with a wrong extension to get through
+//  but too slow to be used (approx. 4sec by file)
+//
+//            try {
+//                String mimeType = Magic.getMagicMatch(media, false).getMimeType();
+//
+//                if (mimeType.startsWith("image/")) {
+//
+//
+            String mimetype = new MimetypesFileTypeMap().getContentType(media);
+            String type = mimetype.split("/")[0];
+            
+            if (type.equals("image")) {
+                System.out.println("It's an image");
+                // It's an image.
+
+                BufferedImage img;
+                try {
+System.out.println("1");
+                    img = ImageIO.read(media);
+System.out.println("1.1");
+
+                    int width = img.getWidth();
+                    int height = img.getHeight();
+System.out.println("2");
+
+                    Dimension initDim = new Dimension(width, height);
+                    Dimension boundaries = new Dimension(75, 75);
+                    Dimension newDim = getScaledDimension(initDim, boundaries);
+System.out.println("3");
+
+                    System.out.println("-scaling img: " + media.getName());
+                    newImg = img.getScaledInstance(newDim.width, newDim.height, Image.SCALE_SMOOTH);
+
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+
+            } else {
+
+                // It's not an image.
+                // If it's a video:
+                // Else: put a generic file icon (could get the corresponding file system icon)
+            }
+
+            // Display
+            System.out.println(
+                    "- adding img: " + media.getName());
+            ImageIcon newImgIcon = new ImageIcon(newImg);
+            JLabel m = new JLabel(newImgIcon);
+
             filesPanel.add(m);
-            System.out.println("-- trying to add a media to the filesPanel");
+
+            LocalDateTime endDate = LocalDateTime.now();
+            Duration duration = Duration.between(beginDate, endDate);
+            long diff = Math.abs(duration.toSeconds());
+
+            System.out.println(
+                    "----- took " + diff + "s");
         }
+        );
+
     }
-    
+
     /**
      * Returns an ImageIcon, or null if the path was invalid.
      *
@@ -186,7 +262,42 @@ public final class UploadPanel extends JPanel {
             return null;
         }
     }
-    
+
+    /**
+     * Get scaled dimensions within boundaries while conserving aspect ratio
+     *
+     * @param imgSize
+     * @param boundary
+     * @return
+     */
+    public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
+
+        int original_width = imgSize.width;
+        int original_height = imgSize.height;
+        int bound_width = boundary.width;
+        int bound_height = boundary.height;
+        int new_width = original_width;
+        int new_height = original_height;
+
+        // first check if we need to scale width
+        if (original_width > bound_width) {
+            //scale width to fit
+            new_width = bound_width;
+            //scale height to maintain aspect ratio
+            new_height = (new_width * original_height) / original_width;
+        }
+
+        // then check if we need to scale even with the new height
+        if (new_height > bound_height) {
+            //scale height to fit instead
+            new_height = bound_height;
+            //scale width to maintain aspect ratio
+            new_width = (new_height * original_width) / original_height;
+        }
+
+        return new Dimension(new_width, new_height);
+    }
+
     /**
      * adds an ActionListener to the open button
      *
@@ -197,7 +308,7 @@ public final class UploadPanel extends JPanel {
         openButton.addActionListener(listenForOpenButton);
 
     }
-    
+
     /**
      * adds an ActionListener to the deco button
      *

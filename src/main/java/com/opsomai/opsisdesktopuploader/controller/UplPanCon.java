@@ -74,6 +74,8 @@ public class UplPanCon extends PanCon {
                 theModel.addFile(f);
             }
             
+            
+            
             theView.showMedias(theModel.getMedias());
             
             needRefresh = true;
@@ -122,4 +124,5 @@ public class UplPanCon extends PanCon {
 
     }
 
+   
 }
