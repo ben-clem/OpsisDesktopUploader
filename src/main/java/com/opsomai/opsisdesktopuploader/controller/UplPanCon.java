@@ -71,12 +71,11 @@ public class UplPanCon extends PanCon {
             
             // Adding them to the model
             for (File f : files) {
-                theModel.addFile(f);
+                theModel.addMedia(f);
             }
             
             
-            
-            theView.showMedias(theModel.getMedias());
+            theView.displayMediasInfo(theModel.getMedias());
             
             needRefresh = true;
             refreshType = "reloadUploadPanel";
