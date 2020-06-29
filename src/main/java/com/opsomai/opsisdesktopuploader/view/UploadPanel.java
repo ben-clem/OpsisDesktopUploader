@@ -4,11 +4,13 @@ import com.opsomai.opsisdesktopuploader.model.Media;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import org.openide.util.Exceptions;
 
 /**
@@ -47,6 +50,7 @@ public final class UploadPanel extends JPanel {
     private JPanel filesPanel;
 
     private Map<Integer, JLabel> thumbnailsMap = new HashMap<>();
+    private Map<Integer, JTextField> titlesMap = new HashMap<>();
     private Map<Integer, JProgressBar> progressMap = new HashMap<>();
     private Map<Integer, JButton> cancelMap = new HashMap<>();
 
@@ -107,8 +111,21 @@ public final class UploadPanel extends JPanel {
 
         choicePanel.add(openButton);
 
-        JLabel lab2 = new JLabel(" ou les glisser-déposer en dessous :");
-        choicePanel.add(lab2);
+        JLabel lab2_1 = new JLabel("  ou les ");
+        choicePanel.add(lab2_1);
+
+        JLabel lab2_2 = new JLabel("glisser-déposer");
+        Font font = lab2_2.getFont();
+        Map attributes = font.getAttributes();
+        attributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        attributes.put(TextAttribute.SIZE, 14.5);
+        lab2_2.setFont(font.deriveFont(attributes));
+        lab2_2.setForeground(new Color(0, 102, 204));
+        choicePanel.add(lab2_2);
+
+        JLabel lab2_3 = new JLabel(" en dessous :");
+        choicePanel.add(lab2_3);
 
         // files uploader
         // adding choice Panel
@@ -125,7 +142,7 @@ public final class UploadPanel extends JPanel {
         // upload panel
         filesPanel = new JPanel();
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
-        filesPanel.setBackground(fg);
+        filesPanel.setBackground(bg);
 
         JScrollPane scrollPane = new JScrollPane(filesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -160,7 +177,14 @@ public final class UploadPanel extends JPanel {
         c4.insets = new Insets(5, 5, 10, 5);
         this.add(start, c4);
 
-        JButton cancel = new JButton("X Annuler");
+        JButton cancel = new JButton();
+
+        try {
+            cancel = new JButton("Annuler", createImageIcon("img/icons8-delete-64.png"));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
         GridBagConstraints c5 = new GridBagConstraints();
         c5.fill = GridBagConstraints.BOTH;
         c5.gridx = 2;
@@ -173,10 +197,13 @@ public final class UploadPanel extends JPanel {
     public void displayMediasInfo(ArrayList<Media> medias) {
 
         filesPanel.removeAll();
-        
+
         medias.stream().forEachOrdered(media -> {
 
-            if (media.getIndex() == 0) {
+            Integer index = media.getIndex();
+            File file = media.getFile();
+
+            if (index == 0) {
                 filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
             }
 
@@ -192,21 +219,67 @@ public final class UploadPanel extends JPanel {
             loadingLabel.setPreferredSize(new Dimension(100, 100));
             loadingLabel.setMaximumSize(new Dimension(100, 100));
 
-            thumbnailsMap.put(media.getIndex(), loadingLabel);
-            System.out.println("** adding to thumbnailsMap : " + media.getIndex());
+            thumbnailsMap.put(index, loadingLabel);
+            System.out.println("** adding to thumbnailsMap : " + index);
 
             eachFilePanel.add(loadingLabel);
 
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
             // Title
+            JLabel titleLabel = new JLabel("Titre : ");
+            eachFilePanel.add(titleLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(2, 2)));
+
+            JTextField titleField = new JTextField(file.getName());
+
+            titleField.setMinimumSize(new Dimension(200, 20));
+            titleField.setPreferredSize(new Dimension(400, 20));
+            titleField.setMaximumSize(new Dimension(600, 20));
+
+            eachFilePanel.add(titleField);
+
+            titlesMap.put(index, titleField);
+
             eachFilePanel.add(Box.createHorizontalGlue());
 
             // Progress Bar
+            JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setValue(0);
+            progressBar.setString("En attente de validation");
+            progressBar.setStringPainted(true);
+
+            progressBar.setMinimumSize(new Dimension(200, 20));
+            progressBar.setPreferredSize(new Dimension(300, 20));
+            progressBar.setMaximumSize(new Dimension(400, 20));
+
+            eachFilePanel.add(progressBar);
+
+            progressMap.put(index, progressBar);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
             // Cancel Button
+            JButton cancelButton = new JButton();
+            try {
+                cancelButton = new JButton(createImageIcon("img/icons8-delete-64.png"));
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+            cancelButton.setMinimumSize(new Dimension(20, 20));
+            cancelButton.setPreferredSize(new Dimension(20, 20));
+            cancelButton.setMaximumSize(new Dimension(20, 20));
+
+            eachFilePanel.add(cancelButton);
+            cancelMap.put(index, cancelButton);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
             // Adding eachFilePanel to filesPanel
             filesPanel.add(eachFilePanel);
-            
+
             filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
         }
