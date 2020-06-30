@@ -74,12 +74,15 @@ public class UplPanCon extends PanCon {
                 theModel.addMedia(f);
             }
             
-            
             theView.displayMediasInfo(theModel.getMedias());
             
+            theModel.run();
+            
+            System.out.println("\n== asking for reload from controller");
+
             needRefresh = true;
             refreshType = "reloadUploadPanel";
-
+            
         }
     }
     
@@ -115,7 +118,7 @@ public class UplPanCon extends PanCon {
     public UplPanCon(UploadPanel theView) {
 
         this.theView = theView;
-        this.theModel = new Medias();
+        this.theModel = new Medias(theView, this);
 
         // Connecting action listeners
         this.theView.addOpenButtonListener(new OpenButtonListener());
@@ -123,5 +126,20 @@ public class UplPanCon extends PanCon {
 
     }
 
+    
+    ///////////////////////
+    // GETTERS / SETTERS //
+    ///////////////////////
+    
+    @Override
+    public void setNeedRefresh(Boolean b) {
+        super.setNeedRefresh(b);
+    }
+
+    @Override
+    public void setRefreshType(String s) {
+        super.setRefreshType(s);
+    }
+    
    
 }

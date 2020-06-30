@@ -1,6 +1,7 @@
 package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
+import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -284,6 +285,97 @@ public final class UploadPanel extends JPanel {
 
         }
         );
+
+    }
+    
+    public void addThumbnail(Thumbnail thumbnail) {
+        
+        thumbnailsMap.replace(thumbnail.getIndex(), new JLabel(thumbnail.getIcon()));
+        
+        refreshMediasInfo();
+        
+    }
+    
+    public void refreshMediasInfo() {
+
+        filesPanel.removeAll();
+        
+        Integer number = 0;
+        
+        if (thumbnailsMap.size() == titlesMap.size() && titlesMap.size() == progressMap.size() && progressMap.size() == cancelMap.size()) {
+            System.out.println("_good matching of components numbers");
+            
+            number = thumbnailsMap.size();
+        }
+
+        for (int i = 0; i < number; i++) {
+
+            if (i == 0) {
+                filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+            }
+
+            JPanel eachFilePanel = new JPanel();
+            eachFilePanel.setLayout(new BoxLayout(eachFilePanel, BoxLayout.LINE_AXIS));
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Thumbnail
+            final JLabel loadingLabel = thumbnailsMap.get(i);
+            loadingLabel.setMinimumSize(new Dimension(100, 100));
+            loadingLabel.setPreferredSize(new Dimension(100, 100));
+            loadingLabel.setMaximumSize(new Dimension(100, 100));
+
+            eachFilePanel.add(loadingLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Title
+            JLabel titleLabel = new JLabel("Titre : ");
+            eachFilePanel.add(titleLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(2, 2)));
+
+            JTextField titleField = titlesMap.get(i);
+
+            titleField.setMinimumSize(new Dimension(200, 20));
+            titleField.setPreferredSize(new Dimension(400, 20));
+            titleField.setMaximumSize(new Dimension(600, 20));
+
+            eachFilePanel.add(titleField);
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            // Progress Bar
+            JProgressBar progressBar = progressMap.get(i);
+            progressBar.setValue(0);
+            progressBar.setString("En attente de validation");
+            progressBar.setStringPainted(true);
+
+            progressBar.setMinimumSize(new Dimension(200, 20));
+            progressBar.setPreferredSize(new Dimension(300, 20));
+            progressBar.setMaximumSize(new Dimension(400, 20));
+
+            eachFilePanel.add(progressBar);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Cancel Button
+            JButton cancelButton = cancelMap.get(i);
+
+            cancelButton.setMinimumSize(new Dimension(20, 20));
+            cancelButton.setPreferredSize(new Dimension(20, 20));
+            cancelButton.setMaximumSize(new Dimension(20, 20));
+
+            eachFilePanel.add(cancelButton);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Adding eachFilePanel to filesPanel
+            filesPanel.add(eachFilePanel);
+
+            filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+        }
 
     }
 

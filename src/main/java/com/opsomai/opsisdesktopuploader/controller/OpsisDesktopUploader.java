@@ -124,7 +124,7 @@ public class OpsisDesktopUploader {
 
             if (needRefresh == true) {
 
-                System.out.println("-- needRefresh = " + needRefresh);
+                System.out.println("\n-- needRefresh = " + needRefresh);
                 System.out.println("-- updating at " + ZonedDateTime.now());
                 System.out.println("-- refreshType = " + refreshType);
 
@@ -145,6 +145,8 @@ public class OpsisDesktopUploader {
 
                     case "reloadUploadPanel":
 
+                        System.out.println("\n=== reload order is received in main thread ===");
+                        
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
 
