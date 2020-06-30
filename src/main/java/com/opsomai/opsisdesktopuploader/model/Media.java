@@ -1,8 +1,6 @@
 package com.opsomai.opsisdesktopuploader.model;
 
-import java.awt.Dimension;
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * Classe média package model

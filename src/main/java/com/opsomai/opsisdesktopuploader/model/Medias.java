@@ -3,6 +3,7 @@ package com.opsomai.opsisdesktopuploader.model;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 
 /**
  * Classe médias package model
@@ -13,6 +14,7 @@ public class Medias {
     // ATTRIBUTS //
     ///////////////
     private ArrayList<Media> medias = new ArrayList<>();
+    private ArrayList<ImageIcon> thumbnails = new ArrayList<>();
 
     //////////////
     // METHODES //
@@ -23,7 +25,22 @@ public class Medias {
     public Medias() {
     }
 
-    
+    /**
+     * creating medias thumbnails in a separate thread
+     */
+    public void createThumbnails() {
+        
+        // for every files in the list (check list !empty())
+        
+        // is the thumbnail generated
+        
+        // else we need to create it
+        
+        // what type of file is it (JMimeMagic)
+        
+        // If it
+        
+    }
 
     /**
      * Get scaled dimensions within boundaries while conserving aspect ratio
