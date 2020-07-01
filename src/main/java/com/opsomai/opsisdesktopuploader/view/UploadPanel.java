@@ -1,6 +1,8 @@
 package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
+import com.opsomai.opsisdesktopuploader.model.Medias;
+import com.opsomai.opsisdesktopuploader.model.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import java.awt.Color;
 import java.awt.Component;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import org.apache.commons.io.FilenameUtils;
 import org.openide.util.Exceptions;
 
 /**
@@ -52,6 +56,7 @@ public final class UploadPanel extends JPanel {
 
     private Map<Integer, JLabel> thumbnailsMap = new HashMap<>();
     private Map<Integer, JTextField> titlesMap = new HashMap<>();
+    private Map<Integer, JLabel> typesMap = new HashMap<>();
     private Map<Integer, JProgressBar> progressMap = new HashMap<>();
     private Map<Integer, JButton> cancelMap = new HashMap<>();
 
@@ -245,6 +250,40 @@ public final class UploadPanel extends JPanel {
 
             eachFilePanel.add(Box.createHorizontalGlue());
 
+            // File type
+            // what type of file is it?
+            String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
+            System.out.println("*** mimetype = " + mimetype);
+
+            // Fixing missing MIME type
+            if ("application/octet-stream".equals(mimetype)) {
+
+                String extension = FilenameUtils.getExtension(media.getFile().getName());
+
+                MimeTypesFixer fixer = new MimeTypesFixer();
+
+                mimetype = fixer.getMap().get(extension).toString();
+
+                System.out.println("*** Fixed missing mimetype = " + mimetype);
+            }
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            JLabel typeLabel = new JLabel(mimetype);
+            
+            typeLabel.setMinimumSize(new Dimension(150, 20));
+            typeLabel.setPreferredSize(new Dimension(150, 20));
+            typeLabel.setMaximumSize(new Dimension(150, 20));
+
+            typesMap.put(index, typeLabel);
+            eachFilePanel.add(typeLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+
             // Progress Bar
             JProgressBar progressBar = new JProgressBar(0, 100);
             progressBar.setValue(0);
@@ -287,24 +326,24 @@ public final class UploadPanel extends JPanel {
         );
 
     }
-    
+
     public void addThumbnail(Thumbnail thumbnail) {
-        
+
         thumbnailsMap.replace(thumbnail.getIndex(), new JLabel(thumbnail.getIcon()));
-        
+
         refreshMediasInfo();
-        
+
     }
-    
+
     public void refreshMediasInfo() {
 
         filesPanel.removeAll();
-        
+
         Integer number = 0;
-        
+
         if (thumbnailsMap.size() == titlesMap.size() && titlesMap.size() == progressMap.size() && progressMap.size() == cancelMap.size()) {
             System.out.println("_good matching of components numbers");
-            
+
             number = thumbnailsMap.size();
         }
 
@@ -343,6 +382,17 @@ public final class UploadPanel extends JPanel {
 
             eachFilePanel.add(titleField);
 
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+            
+            JLabel typeLabel = typesMap.get(i);
+            eachFilePanel.add(typeLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
             eachFilePanel.add(Box.createHorizontalGlue());
 
             // Progress Bar

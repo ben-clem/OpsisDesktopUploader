@@ -42,26 +42,26 @@ public class UplPanCon extends PanCon {
 
             chooser.setMultiSelectionEnabled(true);
             
-            // Adding filter
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory()
-                            || f.getName().toLowerCase().endsWith(".mp4")
-                            || f.getName().toLowerCase().endsWith(".mov")
-                            || f.getName().toLowerCase().endsWith(".jpg")
-                            || f.getName().toLowerCase().endsWith(".jpeg")
-                            || f.getName().toLowerCase().endsWith(".png");
-                }
-
-                @Override
-                public String getDescription() {
-                    return "Images et vidéos";
-                }
-
-            });
+//            // Adding filter
+//            chooser.setAcceptAllFileFilterUsed(false);
+//            chooser.addChoosableFileFilter(new FileFilter() {
+//
+//                @Override
+//                public boolean accept(File f) {
+//                    return f.isDirectory()
+//                            || f.getName().toLowerCase().endsWith(".mp4")
+//                            || f.getName().toLowerCase().endsWith(".mov")
+//                            || f.getName().toLowerCase().endsWith(".jpg")
+//                            || f.getName().toLowerCase().endsWith(".jpeg")
+//                            || f.getName().toLowerCase().endsWith(".png");
+//                }
+//
+//                @Override
+//                public String getDescription() {
+//                    return "Images et vidéos";
+//                }
+//
+//            });
 
             // Show the dialog; wait until dialog is closed
             chooser.showDialog(theView, "Choisissez les fichiers à uploader");
