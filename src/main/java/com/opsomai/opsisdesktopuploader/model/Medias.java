@@ -3,6 +3,7 @@ package com.opsomai.opsisdesktopuploader.model;
 import com.opsomai.opsisdesktopuploader.controller.UplPanCon;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,20 +12,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
+import javax.swing.SwingWorker;
 import org.apache.commons.io.FilenameUtils;
 import org.openide.util.Exceptions;
 
 /**
  * Classe médias package model
  */
-public final class Medias implements Runnable {
+public final class Medias {
 
     ///////////////
     // ATTRIBUTS //
@@ -33,23 +37,107 @@ public final class Medias implements Runnable {
     private ArrayList<Thumbnail> thumbnails = new ArrayList<>();
 
     private static Map s_mapMimeTypes = null;
-    
+
     private UploadPanel theView;
     private UplPanCon theController;
+
+    ////////////////////
+    // NESTED CLASSES //
+    ////////////////////
+    public class ThumbnailsWorker extends SwingWorker<ArrayList<Thumbnail>, Thumbnail> {
+
+        public ThumbnailsWorker() {
+            // Init
+        }
+
+        @Override
+        public ArrayList<Thumbnail> doInBackground() throws Exception {
+
+            ArrayList<Thumbnail> generatedThumbnails = new ArrayList<>();
+
+            // Task
+            medias.forEach(media -> {
+
+                Thumbnail thumbnail = thumbnails.get(media.getIndex());
+
+                // is the thumbnail generated
+                if (thumbnail.getIcon() == null) {
+                    System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is null --> starting creating one");
+
+                    try {
+
+                        thumbnail = createThumbnail(media);
+
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+
+                    publish(thumbnail);
+
+                    generatedThumbnails.add(thumbnail);
+
+
+                } else {
+                    System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
+                }
+
+            });
+
+            // Task end
+            return generatedThumbnails;
+
+        }
+
+        @Override
+        public void process(List<Thumbnail> chunks) {
+
+            chunks.forEach(thumbnail -> {
+                
+                theView.addThumbnail(thumbnail);
+
+                System.out.println("\n== asking for reload from model");
+
+                theController.setNeedRefresh(true);
+                theController.setRefreshType("reloadUploadPanel");
+                
+            });
+
+        }
+        
+        @Override
+            protected void done() {
+                
+                ArrayList<Thumbnail> result = new ArrayList<>();
+                
+                try {
+                    
+                    result = get();
+                    
+                } catch (InterruptedException | ExecutionException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+                
+                thumbnails = result;
+                
+                System.out.println("Task finished");
+            }
+
+    }
 
     //////////////
     // METHODES //
     //////////////
     /**
      * base constructor
+     *
      * @param theView
      * @param theController
      */
     public Medias(UploadPanel theView, UplPanCon theController) {
-        
+
         this.theView = theView;
         this.theController = theController;
-        
+
         s_mapMimeTypes = new HashMap(161);
         s_mapMimeTypes.put("ai", "application/postscript");
         s_mapMimeTypes.put("aif", "audio/x-aiff");
@@ -215,116 +303,90 @@ public final class Medias implements Runnable {
         s_mapMimeTypes.put("zip", "application/zip");
     }
 
-    @Override
-    public void run() {
-
-        medias.forEach((media) -> {
-
-            Thumbnail thumbnail = thumbnails.get(media.getIndex());
-
-            try {
-                
-                createThumbnail(media, thumbnail);
-                
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            
-            theView.addThumbnail(thumbnails.get(media.getIndex()));
-
-            System.out.println("\n== asking for reload from model");
-            
-            theController.setNeedRefresh(true);
-            theController.setRefreshType("reloadUploadPanel");
-            
-        });
-
-    }
-
     /**
      * creating medias thumbnails in a separate thread
      *
      * @param media
-     * @param thumbnail
+     * @return
      * @throws java.io.FileNotFoundException
      */
-    public void createThumbnail(Media media, Thumbnail thumbnail) throws FileNotFoundException, IOException {
+    public Thumbnail createThumbnail(Media media) throws FileNotFoundException, IOException {
 
-        // is the thumbnail generated
-        if (thumbnail.getIcon() == null) {
-            System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is null --> starting creating one");
+        Thumbnail genThumb = new Thumbnail();
 
-            // what type of file is it
-            String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
-            System.out.println("*** mimetype = " + mimetype);
+        // what type of file is it
+        String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
+        System.out.println("*** mimetype = " + mimetype);
 
-            // Fixing missing MIME type
-            if ("application/octet-stream".equals(mimetype)) {
+        // Fixing missing MIME type
+        if ("application/octet-stream".equals(mimetype)) {
 
-                String extension = FilenameUtils.getExtension(media.getFile().getName());
+            String extension = FilenameUtils.getExtension(media.getFile().getName());
 
-                mimetype = s_mapMimeTypes.get(extension).toString();
+            mimetype = s_mapMimeTypes.get(extension).toString();
 
-                System.out.println("*** Fixed missing mimetype = " + mimetype);
-            }
-
-            String type = mimetype.split("/")[0];
-
-            switch (type) {
-
-                case "image":
-
-                    System.out.println("It's an image, starting thumbnail creation");
-
-                    // Image scaling without loading into memory
-                    // https://stackoverflow.com/questions/10817597/java-image-scaling-without-loading-the-whole-image-into-memory
-                    FileInputStream fin = new FileInputStream(media.getFile());
-
-                    ImageInputStream iis = ImageIO.createImageInputStream(fin);
-
-                    Iterator iter = ImageIO.getImageReaders(iis);
-                    if (!iter.hasNext()) {
-                        return;
-                    }
-
-                    ImageReader reader = (ImageReader) iter.next();
-
-                    ImageReadParam params = reader.getDefaultReadParam();
-
-                    reader.setInput(iis, true, true);
-
-                    // Determining final Width and Height :
-                    
-                    
-                    
-                    //
-                    
-                    params.setSourceSubsampling(10, 10, 0, 0);
-                    //params.setSourceSubsampling(width, height, 0, 0);
-
-                    BufferedImage img = reader.read(0, params);
-
-                    ImageIcon icon = new ImageIcon(img);
-
-                    thumbnails.set(thumbnail.getIndex(), new Thumbnail(thumbnail.getIndex(), icon));
-                    
-                    // Fin
-                    break;
-
-                case "video":
-                    // If it's a video
-                    System.out.println("It's a video, starting thumbnail creation");
-                    break;
-
-                default:
-                    // Else --> generic file icon
-                    System.out.println("It's any other file type, putting generic file icon");
-                    break;
-            }
-
-        } else {
-            System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
+            System.out.println("*** Fixed missing mimetype = " + mimetype);
         }
+
+        String type = mimetype.split("/")[0];
+
+        switch (type) {
+
+            case "image":
+
+                System.out.println("It's an image, starting thumbnail creation");
+
+                // Image scaling without loading into memory
+                // https://stackoverflow.com/questions/10817597/java-image-scaling-without-loading-the-whole-image-into-memory
+                FileInputStream fin = new FileInputStream(media.getFile());
+
+                ImageInputStream iis = ImageIO.createImageInputStream(fin);
+
+                Iterator iter = ImageIO.getImageReaders(iis);
+                if (!iter.hasNext()) {
+                    break;
+                }
+
+                ImageReader reader = (ImageReader) iter.next();
+
+                ImageReadParam params = reader.getDefaultReadParam();
+
+                reader.setInput(iis, true, true);
+
+                // Getting intermediate image with size divided by 4
+                params.setSourceSubsampling(4, 4, 0, 0);
+                BufferedImage img = reader.read(0, params);
+                
+                // Determining final Width and Height :
+                
+                Dimension dim = new Dimension(img.getWidth(), img.getHeight());
+                
+                Dimension newDim = getScaledDimension(dim, new Dimension(100, 100));
+                
+                Image newImg = img.getScaledInstance((int) newDim.getWidth(), (int) newDim.getHeight(), Image.SCALE_SMOOTH);
+                
+                //
+                
+
+                ImageIcon icon = new ImageIcon(newImg);
+
+                genThumb = new Thumbnail(media.getIndex(), icon);
+
+                // Fin
+                break;
+
+            case "video":
+                // If it's a video
+                System.out.println("It's a video, starting thumbnail creation");
+                break;
+
+            default:
+                // Else --> generic file icon
+                System.out.println("It's any other file type, putting generic file icon");
+                break;
+        }
+
+        return genThumb;
 
     }
 

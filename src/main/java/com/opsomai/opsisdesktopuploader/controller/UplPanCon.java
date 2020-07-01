@@ -76,12 +76,14 @@ public class UplPanCon extends PanCon {
             
             theView.displayMediasInfo(theModel.getMedias());
             
-            theModel.run();
-            
             System.out.println("\n== asking for reload from controller");
 
             needRefresh = true;
             refreshType = "reloadUploadPanel";
+          
+            Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
+            
+            thumbsWorker.execute();
             
         }
     }
