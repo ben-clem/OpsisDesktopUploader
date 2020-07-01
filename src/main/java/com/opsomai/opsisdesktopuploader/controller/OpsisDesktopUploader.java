@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.apache.log4j.BasicConfigurator;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openide.util.Exceptions;
@@ -125,7 +124,7 @@ public class OpsisDesktopUploader {
 
             if (needRefresh == true) {
 
-                System.out.println("-- needRefresh = " + needRefresh);
+                System.out.println("\n-- needRefresh = " + needRefresh);
                 System.out.println("-- updating at " + ZonedDateTime.now());
                 System.out.println("-- refreshType = " + refreshType);
 
@@ -146,6 +145,8 @@ public class OpsisDesktopUploader {
 
                     case "reloadUploadPanel":
 
+                        System.out.println("\n=== reload order is received in main thread ===");
+                        
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
 

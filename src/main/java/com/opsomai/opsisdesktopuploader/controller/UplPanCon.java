@@ -42,26 +42,26 @@ public class UplPanCon extends PanCon {
 
             chooser.setMultiSelectionEnabled(true);
             
-            // Adding filter
-            chooser.setAcceptAllFileFilterUsed(false);
-            chooser.addChoosableFileFilter(new FileFilter() {
-
-                @Override
-                public boolean accept(File f) {
-                    return f.isDirectory()
-                            || f.getName().toLowerCase().endsWith(".mp4")
-                            || f.getName().toLowerCase().endsWith(".mov")
-                            || f.getName().toLowerCase().endsWith(".jpg")
-                            || f.getName().toLowerCase().endsWith(".jpeg")
-                            || f.getName().toLowerCase().endsWith(".png");
-                }
-
-                @Override
-                public String getDescription() {
-                    return "Images et vidéos";
-                }
-
-            });
+//            // Adding filter
+//            chooser.setAcceptAllFileFilterUsed(false);
+//            chooser.addChoosableFileFilter(new FileFilter() {
+//
+//                @Override
+//                public boolean accept(File f) {
+//                    return f.isDirectory()
+//                            || f.getName().toLowerCase().endsWith(".mp4")
+//                            || f.getName().toLowerCase().endsWith(".mov")
+//                            || f.getName().toLowerCase().endsWith(".jpg")
+//                            || f.getName().toLowerCase().endsWith(".jpeg")
+//                            || f.getName().toLowerCase().endsWith(".png");
+//                }
+//
+//                @Override
+//                public String getDescription() {
+//                    return "Images et vidéos";
+//                }
+//
+//            });
 
             // Show the dialog; wait until dialog is closed
             chooser.showDialog(theView, "Choisissez les fichiers à uploader");
@@ -71,16 +71,20 @@ public class UplPanCon extends PanCon {
             
             // Adding them to the model
             for (File f : files) {
-                theModel.addFile(f);
+                theModel.addMedia(f);
             }
             
+            theView.displayMediasInfo(theModel.getMedias());
             
-            
-            theView.showMedias(theModel.getMedias());
-            
+            System.out.println("\n== asking for reload from controller");
+
             needRefresh = true;
             refreshType = "reloadUploadPanel";
-
+          
+            Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
+            
+            thumbsWorker.execute();
+            
         }
     }
     
@@ -116,7 +120,7 @@ public class UplPanCon extends PanCon {
     public UplPanCon(UploadPanel theView) {
 
         this.theView = theView;
-        this.theModel = new Medias();
+        this.theModel = new Medias(theView, this);
 
         // Connecting action listeners
         this.theView.addOpenButtonListener(new OpenButtonListener());
@@ -124,5 +128,20 @@ public class UplPanCon extends PanCon {
 
     }
 
+    
+    ///////////////////////
+    // GETTERS / SETTERS //
+    ///////////////////////
+    
+    @Override
+    public void setNeedRefresh(Boolean b) {
+        super.setNeedRefresh(b);
+    }
+
+    @Override
+    public void setRefreshType(String s) {
+        super.setRefreshType(s);
+    }
+    
    
 }

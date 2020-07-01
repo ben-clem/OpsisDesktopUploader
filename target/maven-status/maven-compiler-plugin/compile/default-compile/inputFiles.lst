@@ -1,5 +1,10 @@
 /Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/view/Window.java
+/Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/view/UploadPanel.java
 /Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/controller/PanCon.java
 /Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/controller/ConPanCon.java
+/Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/model/Medias.java
+/Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/model/Thumbnail.java
 /Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/view/ConnectionPanel.java
+/Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/controller/UplPanCon.java
+/Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/model/Media.java
 /Users/benoitclemenceau/NetBeansProjects/OpsisDesktopUploader/src/main/java/com/opsomai/opsisdesktopuploader/controller/OpsisDesktopUploader.java

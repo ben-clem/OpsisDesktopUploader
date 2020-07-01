@@ -1,21 +1,27 @@
 package com.opsomai.opsisdesktopuploader.view;
 
+import com.opsomai.opsisdesktopuploader.model.Media;
+import com.opsomai.opsisdesktopuploader.model.Medias;
+import com.opsomai.opsisdesktopuploader.model.MimeTypesFixer;
+import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.awt.font.TextAttribute;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -24,8 +30,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import org.apache.commons.io.FilenameUtils;
 import org.openide.util.Exceptions;
-import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Upload Screen
@@ -44,6 +53,12 @@ public final class UploadPanel extends JPanel {
     private JButton deco;
     private JButton openButton;
     private JPanel filesPanel;
+
+    private Map<Integer, JLabel> thumbnailsMap = new HashMap<>();
+    private Map<Integer, JTextField> titlesMap = new HashMap<>();
+    private Map<Integer, JLabel> typesMap = new HashMap<>();
+    private Map<Integer, JProgressBar> progressMap = new HashMap<>();
+    private Map<Integer, JButton> cancelMap = new HashMap<>();
 
     //////////////
     // METHODES //
@@ -102,8 +117,21 @@ public final class UploadPanel extends JPanel {
 
         choicePanel.add(openButton);
 
-        JLabel lab2 = new JLabel(" ou les glisser-déposer en dessous :");
-        choicePanel.add(lab2);
+        JLabel lab2_1 = new JLabel("  ou les ");
+        choicePanel.add(lab2_1);
+
+        JLabel lab2_2 = new JLabel("glisser-déposer");
+        Font font = lab2_2.getFont();
+        Map attributes = font.getAttributes();
+        attributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+        attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        attributes.put(TextAttribute.SIZE, 14.5);
+        lab2_2.setFont(font.deriveFont(attributes));
+        lab2_2.setForeground(new Color(0, 102, 204));
+        choicePanel.add(lab2_2);
+
+        JLabel lab2_3 = new JLabel(" en dessous :");
+        choicePanel.add(lab2_3);
 
         // files uploader
         // adding choice Panel
@@ -120,9 +148,10 @@ public final class UploadPanel extends JPanel {
         // upload panel
         filesPanel = new JPanel();
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
+        filesPanel.setBackground(bg);
 
-        filesPanel.setBackground(fg);
-        //filesPanel.setMinimumSize(new Dimension(500, 100));
+        JScrollPane scrollPane = new JScrollPane(filesPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         GridBagConstraints c3 = new GridBagConstraints();
         c3.fill = GridBagConstraints.BOTH;
@@ -131,7 +160,7 @@ public final class UploadPanel extends JPanel {
         c3.gridwidth = 3;
         c3.weighty = 1;
         c3.insets = new Insets(5, 5, 5, 5);
-        this.add(filesPanel, c3);
+        this.add(scrollPane, c3);
 
         // buttons
         Component box = Box.createHorizontalStrut(1);
@@ -154,7 +183,14 @@ public final class UploadPanel extends JPanel {
         c4.insets = new Insets(5, 5, 10, 5);
         this.add(start, c4);
 
-        JButton cancel = new JButton("X Annuler");
+        JButton cancel = new JButton();
+
+        try {
+            cancel = new JButton("Annuler", createImageIcon("img/icons8-delete-64.png"));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
         GridBagConstraints c5 = new GridBagConstraints();
         c5.fill = GridBagConstraints.BOTH;
         c5.gridx = 2;
@@ -164,83 +200,232 @@ public final class UploadPanel extends JPanel {
         this.add(cancel, c5);
     }
 
-    public void showMedias(ArrayList<File> medias) {
+    public void displayMediasInfo(ArrayList<Media> medias) {
 
-        ImageIO.setUseCache(false);
-        
-        medias.stream().forEach((media) -> {
+        filesPanel.removeAll();
 
-            System.out.println("-beginning working on: " + media.getName());
-            LocalDateTime beginDate = LocalDateTime.now();
+        medias.stream().forEachOrdered(media -> {
 
-            Image newImg = null;
+            Integer index = media.getIndex();
+            File file = media.getFile();
 
-            // Media Display
-            // Getting the thumbnail
-            // If it's an image: scale it
-//
-//  Solution using MIME type checking in the file header with JMimeMagic
-//  more secure because it prevents file with a wrong extension to get through
-//  but too slow to be used (approx. 4sec by file)
-//
-//            try {
-//                String mimeType = Magic.getMagicMatch(media, false).getMimeType();
-//
-//                if (mimeType.startsWith("image/")) {
-//
-//
-            String mimetype = new MimetypesFileTypeMap().getContentType(media);
-            String type = mimetype.split("/")[0];
-            
-            if (type.equals("image")) {
-                System.out.println("It's an image");
-                // It's an image.
-
-                BufferedImage img;
-                try {
-System.out.println("1");
-                    img = ImageIO.read(media);
-System.out.println("1.1");
-
-                    int width = img.getWidth();
-                    int height = img.getHeight();
-System.out.println("2");
-
-                    Dimension initDim = new Dimension(width, height);
-                    Dimension boundaries = new Dimension(75, 75);
-                    Dimension newDim = getScaledDimension(initDim, boundaries);
-System.out.println("3");
-
-                    System.out.println("-scaling img: " + media.getName());
-                    newImg = img.getScaledInstance(newDim.width, newDim.height, Image.SCALE_SMOOTH);
-
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-
-            } else {
-
-                // It's not an image.
-                // If it's a video:
-                // Else: put a generic file icon (could get the corresponding file system icon)
+            if (index == 0) {
+                filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
             }
 
-            // Display
-            System.out.println(
-                    "- adding img: " + media.getName());
-            ImageIcon newImgIcon = new ImageIcon(newImg);
-            JLabel m = new JLabel(newImgIcon);
+            JPanel eachFilePanel = new JPanel();
+            eachFilePanel.setLayout(new BoxLayout(eachFilePanel, BoxLayout.LINE_AXIS));
 
-            filesPanel.add(m);
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
-            LocalDateTime endDate = LocalDateTime.now();
-            Duration duration = Duration.between(beginDate, endDate);
-            long diff = Math.abs(duration.toSeconds());
+            // Thumbnail loading icon (while separate thread is loading actual thumbnail)
+            ImageIcon loading = new ImageIcon("img/ajax-loader.gif");
+            final JLabel loadingLabel = new JLabel(loading, JLabel.CENTER);
+            loadingLabel.setMinimumSize(new Dimension(100, 100));
+            loadingLabel.setPreferredSize(new Dimension(100, 100));
+            loadingLabel.setMaximumSize(new Dimension(100, 100));
 
-            System.out.println(
-                    "----- took " + diff + "s");
+            thumbnailsMap.put(index, loadingLabel);
+            System.out.println("** adding to thumbnailsMap : " + index);
+
+            eachFilePanel.add(loadingLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Title
+            JLabel titleLabel = new JLabel("Titre : ");
+            eachFilePanel.add(titleLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(2, 2)));
+
+            JTextField titleField = new JTextField(file.getName());
+
+            titleField.setMinimumSize(new Dimension(200, 20));
+            titleField.setPreferredSize(new Dimension(400, 20));
+            titleField.setMaximumSize(new Dimension(600, 20));
+
+            eachFilePanel.add(titleField);
+
+            titlesMap.put(index, titleField);
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            // File type
+            // what type of file is it?
+            String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
+            System.out.println("*** mimetype = " + mimetype);
+
+            // Fixing missing MIME type
+            if ("application/octet-stream".equals(mimetype)) {
+
+                String extension = FilenameUtils.getExtension(media.getFile().getName());
+
+                MimeTypesFixer fixer = new MimeTypesFixer();
+
+                mimetype = fixer.getMap().get(extension).toString();
+
+                System.out.println("*** Fixed missing mimetype = " + mimetype);
+            }
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            JLabel typeLabel = new JLabel(mimetype);
+            
+            typeLabel.setMinimumSize(new Dimension(150, 20));
+            typeLabel.setPreferredSize(new Dimension(150, 20));
+            typeLabel.setMaximumSize(new Dimension(150, 20));
+
+            typesMap.put(index, typeLabel);
+            eachFilePanel.add(typeLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            // Progress Bar
+            JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setValue(0);
+            progressBar.setString("En attente de validation");
+            progressBar.setStringPainted(true);
+
+            progressBar.setMinimumSize(new Dimension(200, 20));
+            progressBar.setPreferredSize(new Dimension(300, 20));
+            progressBar.setMaximumSize(new Dimension(400, 20));
+
+            eachFilePanel.add(progressBar);
+
+            progressMap.put(index, progressBar);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Cancel Button
+            JButton cancelButton = new JButton();
+            try {
+                cancelButton = new JButton(createImageIcon("img/icons8-delete-64.png"));
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+            cancelButton.setMinimumSize(new Dimension(20, 20));
+            cancelButton.setPreferredSize(new Dimension(20, 20));
+            cancelButton.setMaximumSize(new Dimension(20, 20));
+
+            eachFilePanel.add(cancelButton);
+            cancelMap.put(index, cancelButton);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Adding eachFilePanel to filesPanel
+            filesPanel.add(eachFilePanel);
+
+            filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
         }
         );
+
+    }
+
+    public void addThumbnail(Thumbnail thumbnail) {
+
+        thumbnailsMap.replace(thumbnail.getIndex(), new JLabel(thumbnail.getIcon()));
+
+        refreshMediasInfo();
+
+    }
+
+    public void refreshMediasInfo() {
+
+        filesPanel.removeAll();
+
+        Integer number = 0;
+
+        if (thumbnailsMap.size() == titlesMap.size() && titlesMap.size() == progressMap.size() && progressMap.size() == cancelMap.size()) {
+            System.out.println("_good matching of components numbers");
+
+            number = thumbnailsMap.size();
+        }
+
+        for (int i = 0; i < number; i++) {
+
+            if (i == 0) {
+                filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+            }
+
+            JPanel eachFilePanel = new JPanel();
+            eachFilePanel.setLayout(new BoxLayout(eachFilePanel, BoxLayout.LINE_AXIS));
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Thumbnail
+            final JLabel loadingLabel = thumbnailsMap.get(i);
+            loadingLabel.setMinimumSize(new Dimension(100, 100));
+            loadingLabel.setPreferredSize(new Dimension(100, 100));
+            loadingLabel.setMaximumSize(new Dimension(100, 100));
+
+            eachFilePanel.add(loadingLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Title
+            JLabel titleLabel = new JLabel("Titre : ");
+            eachFilePanel.add(titleLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(2, 2)));
+
+            JTextField titleField = titlesMap.get(i);
+
+            titleField.setMinimumSize(new Dimension(200, 20));
+            titleField.setPreferredSize(new Dimension(400, 20));
+            titleField.setMaximumSize(new Dimension(600, 20));
+
+            eachFilePanel.add(titleField);
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+            
+            JLabel typeLabel = typesMap.get(i);
+            eachFilePanel.add(typeLabel);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+            eachFilePanel.add(Box.createHorizontalGlue());
+
+            // Progress Bar
+            JProgressBar progressBar = progressMap.get(i);
+            progressBar.setValue(0);
+            progressBar.setString("En attente de validation");
+            progressBar.setStringPainted(true);
+
+            progressBar.setMinimumSize(new Dimension(200, 20));
+            progressBar.setPreferredSize(new Dimension(300, 20));
+            progressBar.setMaximumSize(new Dimension(400, 20));
+
+            eachFilePanel.add(progressBar);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Cancel Button
+            JButton cancelButton = cancelMap.get(i);
+
+            cancelButton.setMinimumSize(new Dimension(20, 20));
+            cancelButton.setPreferredSize(new Dimension(20, 20));
+            cancelButton.setMaximumSize(new Dimension(20, 20));
+
+            eachFilePanel.add(cancelButton);
+
+            eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+            // Adding eachFilePanel to filesPanel
+            filesPanel.add(eachFilePanel);
+
+            filesPanel.add(Box.createRigidArea(new Dimension(10, 10)));
+
+        }
 
     }
 
@@ -261,41 +446,6 @@ System.out.println("3");
             System.err.println("Couldn't find file: " + path);
             return null;
         }
-    }
-
-    /**
-     * Get scaled dimensions within boundaries while conserving aspect ratio
-     *
-     * @param imgSize
-     * @param boundary
-     * @return
-     */
-    public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
-
-        int original_width = imgSize.width;
-        int original_height = imgSize.height;
-        int bound_width = boundary.width;
-        int bound_height = boundary.height;
-        int new_width = original_width;
-        int new_height = original_height;
-
-        // first check if we need to scale width
-        if (original_width > bound_width) {
-            //scale width to fit
-            new_width = bound_width;
-            //scale height to maintain aspect ratio
-            new_height = (new_width * original_height) / original_width;
-        }
-
-        // then check if we need to scale even with the new height
-        if (new_height > bound_height) {
-            //scale height to fit instead
-            new_height = bound_height;
-            //scale width to maintain aspect ratio
-            new_width = (new_height * original_width) / original_height;
-        }
-
-        return new Dimension(new_width, new_height);
     }
 
     /**
