@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +58,8 @@ public final class Medias {
 
             ArrayList<Thumbnail> generatedThumbnails = new ArrayList<>();
 
+           
+            
             // Task
             medias.forEach(media -> {
 
@@ -80,6 +83,15 @@ public final class Medias {
 
                 } else {
                     System.out.println("\n_Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
+                
+                    thumbnail = thumbnails.get(media.getIndex());
+                    
+                    thumbnail.setIndex(media.getIndex());
+                    
+                    publish(thumbnail);
+                    
+                    generatedThumbnails.add(thumbnail);
+                    
                 }
 
             });
@@ -148,8 +160,6 @@ public final class Medias {
      * @throws java.io.FileNotFoundException
      */
     public Thumbnail createThumbnail(Media media) throws FileNotFoundException, IOException {
-
-        Thumbnail genThumb = new Thumbnail();
 
         // what type of file is it
         String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
@@ -286,7 +296,9 @@ public final class Medias {
 //
         ImageIcon icon = new ImageIcon(newImg);
 
-        genThumb = new Thumbnail(media.getIndex(), icon);
+        Thumbnail genThumb = new Thumbnail(media.getIndex(), icon);
+        
+        System.out.println("_creating thumbnail: " + media.getIndex());
 
         // Fin
         return genThumb;
@@ -335,10 +347,12 @@ public final class Medias {
 
         Integer index;
 
-        if (medias.isEmpty()) {
+        if (this.medias.isEmpty()) {
             index = 0;
+            System.out.println("_medias is empty: index = " + index);
         } else {
-            index = medias.size();
+            index = this.medias.size();
+            System.out.println("_medias is not empty: index = " + index);
         }
 
         Media media = new Media(index, file);
@@ -350,9 +364,16 @@ public final class Medias {
         this.thumbnails.add(thumbnail);
 
     }
+    
+    public void sortAllByIndex() {
+        
+        this.medias.sort(Comparator.comparing(Media::getIndex));
+        this.thumbnails.sort(Comparator.comparing(Thumbnail::getIndex));
+        
+    }
 
     public ArrayList<Media> getMedias() {
-        return medias;
+        return this.medias;
     }
 
 }

@@ -87,6 +87,9 @@ public class UplPanCon extends PanCon {
                 theModel.addMedia(f);
 
             });
+            
+            // Sorting all by index
+            theModel.sortAllByIndex();
 
             theView.displayMediasInfo(theModel.getMedias());
 
