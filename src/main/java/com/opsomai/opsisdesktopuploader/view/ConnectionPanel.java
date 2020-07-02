@@ -63,9 +63,9 @@ public final class ConnectionPanel extends JPanel {
 
         // Title
         titleLabel = new JLabel("<html>Opsis Desktop Uploader<br>"
-                + "........................<br/>"
-                + "........................<br/>"
-                + "....................</html>", SwingConstants.CENTER);
+                + "<br/>"
+                + "<br/>"
+                + "</html>", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Helvetica Neue", Font.PLAIN, 15));
         titleLabel.setForeground(Color.BLACK);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

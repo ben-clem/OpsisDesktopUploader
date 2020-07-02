@@ -3,13 +3,17 @@ package com.opsomai.opsisdesktopuploader.controller;
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import com.opsomai.opsisdesktopuploader.view.Window;
+import java.awt.event.KeyEvent;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.time.ZonedDateTime;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultEditorKit;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openide.util.Exceptions;
@@ -22,6 +26,8 @@ public class OpsisDesktopUploader {
     ///////////////
     // ATTRIBUTS //
     ///////////////
+    private String os;
+
     private Window win;
 
     private Boolean needRefresh;
@@ -51,9 +57,17 @@ public class OpsisDesktopUploader {
             "ENTER", "pressed",
             "released ENTER", "released"
         }));
-        
-        // Configure log4j for MIME type checking with JMimeType (ditched because too slow)
-        // BasicConfigurator.configure();
+
+        // Getting the OSType
+        String OSType = OSValidator.getOSType();
+
+        // Fixing copy / paste on macOS
+        if ("macOS".equals(OSType)) {
+            InputMap im = (InputMap) UIManager.get("TextField.focusInputMap");
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
+            im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
+        }
 
         // Instanciating the controller
         OpsisDesktopUploader winCon = new OpsisDesktopUploader();
@@ -146,12 +160,12 @@ public class OpsisDesktopUploader {
                     case "reloadUploadPanel":
 
                         System.out.println("\n=== reload order is received in main thread ===");
-                        
+
                         int scrollPos = uploadPanel.getScrollBarVerticalPosition();
-                        
+
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
-                        
+
                         uploadPanel.setScrollBarVerticalPosition(scrollPos);
 
                         panCon.setNeedRefresh(false);

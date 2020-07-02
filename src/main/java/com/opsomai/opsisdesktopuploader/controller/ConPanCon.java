@@ -7,6 +7,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.net.Authenticator;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpClient.Version;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openide.util.Exceptions;
@@ -51,7 +59,46 @@ public class ConPanCon extends PanCon {
             } else {
 
                 // vérifier format ?
-                // connexion (requète recherche vide, try sinon popup)
+                // CONNEXION (requète recherche vide, try sinon popup)
+                String requestBody = "api_key=" + api;
+                HttpResponse<String> response;
+
+                try {
+
+                    // Building client and request
+                    System.setProperty("javax.net.ssl.trustStore", "test.jks");
+                    System.setProperty("javax.net.ssl.trustStoreType", "jks");
+
+                    HttpClient client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_1_1)
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .followRedirects(Redirect.NORMAL)
+                            .connectTimeout(Duration.ofSeconds(30))
+                            .authenticator(Authenticator.getDefault())
+                            .build();
+
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create("https://" + url + "/service.php?urlaction=recherche"))
+                            .timeout(Duration.ofSeconds(30))
+                            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                            .build();
+
+                    response = client.send(request,
+                            HttpResponse.BodyHandlers.ofString());
+
+                    System.out.println(response.toString() + "\n-------\n"
+                            + "authenticator : " + client.authenticator() + "\n-------\n"
+                            + "\n-------\n"
+                            + "\n-------\n"
+                            + response.headers() + "\n-------\n"
+                            + response.version() + "\n-------\n"
+                            + response.body());
+
+                } catch (IOException | InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+
+                // Fin connexion
                 // Save info in file (json)
                 JSONObject obj = new JSONObject();
                 obj.put("url", url);
@@ -66,11 +113,12 @@ public class ConPanCon extends PanCon {
                     e.printStackTrace(System.err);
                 }
 
+                // Set needRefresh and refreshType
+                needRefresh = true;
+                refreshType = "loadUploadPanel";
+
             }
 
-            // Set needRefresh and refreshType
-            needRefresh = true;
-            refreshType = "loadUploadPanel";
         }
 
     }
@@ -126,7 +174,7 @@ public class ConPanCon extends PanCon {
                 }
             } else {
                 System.out.println("-- connection-info.json is empty");
-                
+
                 this.theView = theView;
                 // Connecting the action listener to the view
                 this.theView.addConnButtonListener(new ConnButtonListener());
