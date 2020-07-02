@@ -112,6 +112,7 @@ public class MimeTypesFixer {
         s_mapMimeTypes.put("ppm", "image/x-portable-pixmap");
         s_mapMimeTypes.put("ppt", "application/vnd.ms-powerpoint");
         s_mapMimeTypes.put("ps", "application/postscript");
+        s_mapMimeTypes.put("psd", "application/photoshop");
         s_mapMimeTypes.put("qt", "video/quicktime");
         s_mapMimeTypes.put("ra", "audio/x-pn-realaudio");
         s_mapMimeTypes.put("ra", "audio/x-realaudio");

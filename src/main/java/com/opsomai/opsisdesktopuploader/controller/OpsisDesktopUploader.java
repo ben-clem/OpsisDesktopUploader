@@ -147,8 +147,12 @@ public class OpsisDesktopUploader {
 
                         System.out.println("\n=== reload order is received in main thread ===");
                         
+                        int scrollPos = uploadPanel.getScrollBarVerticalPosition();
+                        
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
+                        
+                        uploadPanel.setScrollBarVerticalPosition(scrollPos);
 
                         panCon.setNeedRefresh(false);
 
