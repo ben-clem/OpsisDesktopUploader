@@ -53,6 +53,7 @@ public final class UploadPanel extends JPanel {
     private JButton deco;
     private JButton openButton;
     private JPanel filesPanel;
+    private JScrollPane scrollPane;
 
     private Map<Integer, JLabel> thumbnailsMap = new HashMap<>();
     private Map<Integer, JTextField> titlesMap = new HashMap<>();
@@ -150,7 +151,7 @@ public final class UploadPanel extends JPanel {
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
         filesPanel.setBackground(bg);
 
-        JScrollPane scrollPane = new JScrollPane(filesPanel);
+        scrollPane = new JScrollPane(filesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         GridBagConstraints c3 = new GridBagConstraints();
@@ -482,5 +483,17 @@ public final class UploadPanel extends JPanel {
      */
     public JButton getOpenButton() {
         return openButton;
+    }
+    
+    public JPanel getFilesPanel() {
+        return filesPanel;
+    }
+    
+    public int getScrollBarVerticalPosition() {
+        return scrollPane.getVerticalScrollBar().getValue();
+    }
+    
+    public void setScrollBarVerticalPosition(int position) {
+        scrollPane.getVerticalScrollBar().setValue(position);
     }
 }

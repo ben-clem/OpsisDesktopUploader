@@ -69,38 +69,44 @@ public class UplPanCon extends PanCon {
 //
 //            });
             // Show the dialog; wait until dialog is closed
-            chooser.showDialog(theView, "Choisissez les fichiers à uploader");
+            int result = chooser.showDialog(theView, "Choisissez les fichiers à uploader");
 
-            // Retrieve the selected files.
-            File[] files = chooser.getSelectedFiles();
+            if (result == JFileChooser.APPROVE_OPTION) {
 
-            // Converting to ArrayList
-            List<File> filesList = Arrays.asList(files);
+                // Retrieve the selected files.
+                File[] files = chooser.getSelectedFiles();
 
-            // Sorting the list alphabetically in descending order
-            Collections.sort(filesList, new SortIgnoreCase());
+                // Converting to ArrayList
+                List<File> filesList = Arrays.asList(files);
 
-            // Adding them to the model
-            filesList.forEach(f -> {
-                
-                System.out.println("___adding " + f.getName());
-                theModel.addMedia(f);
+                // Sorting the list alphabetically in descending order
+                Collections.sort(filesList, new SortIgnoreCase());
 
-            });
-            
-            // Sorting all by index
-            theModel.sortAllByIndex();
+                // Adding them to the model
+                filesList.forEach(f -> {
 
-            theView.displayMediasInfo(theModel.getMedias());
+                    System.out.println("___adding " + f.getName());
+                    theModel.addMedia(f);
 
-            System.out.println("\n___asking for reload from controller");
+                });
 
-            needRefresh = true;
-            refreshType = "reloadUploadPanel";
+                // Sorting all by index
+                theModel.sortAllByIndex();
 
-            Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
+                theView.displayMediasInfo(theModel.getMedias());
 
-            thumbsWorker.execute();
+                System.out.println("\n___asking for reload from controller");
+
+                needRefresh = true;
+                refreshType = "reloadUploadPanel";
+
+                Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
+
+                thumbsWorker.execute();
+
+            } else if (result == JFileChooser.CANCEL_OPTION) {
+                // Do nothing
+            }
 
         }
     }
@@ -144,11 +150,12 @@ public class UplPanCon extends PanCon {
         this.theView.addDecoButtonListener(new DecoButtonListener());
 
     }
-    
+
     /**
-     *  Utility class to sort files without looking at the case
+     * Utility class to sort files without looking at the case
      */
     public class SortIgnoreCase implements Comparator<File> {
+
         @Override
         public int compare(File o1, File o2) {
             String s1 = o1.getName();
