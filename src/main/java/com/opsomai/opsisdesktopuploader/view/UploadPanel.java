@@ -226,7 +226,6 @@ public final class UploadPanel extends JPanel {
             loadingLabel.setMaximumSize(new Dimension(100, 100));
 
             thumbnailsMap.put(index, loadingLabel);
-            System.out.println("** adding to thumbnailsMap : " + index);
 
             eachFilePanel.add(loadingLabel);
 
@@ -253,7 +252,7 @@ public final class UploadPanel extends JPanel {
             // File type
             // what type of file is it?
             String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
-            System.out.println("*** mimetype = " + mimetype);
+            System.out.println("__mimetype = " + mimetype);
 
             // Fixing missing MIME type
             if ("application/octet-stream".equals(mimetype)) {
@@ -262,18 +261,23 @@ public final class UploadPanel extends JPanel {
 
                 MimeTypesFixer fixer = new MimeTypesFixer();
 
-                mimetype = fixer.getMap().get(extension).toString();
+                try {
+                    mimetype = fixer.getMap().get(extension).toString();
+                    System.out.println("__fixed missing mimetype = " + mimetype);
+                } catch (Exception e) {
+                    e.printStackTrace(System.err);
+                    System.out.println("__unable to fix MIME type, keeping: " + mimetype);
+                }
 
-                System.out.println("*** Fixed missing mimetype = " + mimetype);
             }
 
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
             JLabel typeLabel = new JLabel(mimetype);
-            
-            typeLabel.setMinimumSize(new Dimension(150, 20));
-            typeLabel.setPreferredSize(new Dimension(150, 20));
-            typeLabel.setMaximumSize(new Dimension(150, 20));
+
+            typeLabel.setMinimumSize(new Dimension(200, 20));
+            typeLabel.setPreferredSize(new Dimension(200, 20));
+            typeLabel.setMaximumSize(new Dimension(200, 20));
 
             typesMap.put(index, typeLabel);
             eachFilePanel.add(typeLabel);
@@ -342,7 +346,7 @@ public final class UploadPanel extends JPanel {
         Integer number = 0;
 
         if (thumbnailsMap.size() == titlesMap.size() && titlesMap.size() == progressMap.size() && progressMap.size() == cancelMap.size()) {
-            System.out.println("_good matching of components numbers");
+            System.out.println("__good matching of components numbers");
 
             number = thumbnailsMap.size();
         }
@@ -385,7 +389,7 @@ public final class UploadPanel extends JPanel {
             eachFilePanel.add(Box.createHorizontalGlue());
 
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
-            
+
             JLabel typeLabel = typesMap.get(i);
             eachFilePanel.add(typeLabel);
 
@@ -443,7 +447,7 @@ public final class UploadPanel extends JPanel {
         if (img != null) {
             return logo;
         } else {
-            System.err.println("Couldn't find file: " + path);
+            System.err.println("__Couldn't find file: " + path);
             return null;
         }
     }

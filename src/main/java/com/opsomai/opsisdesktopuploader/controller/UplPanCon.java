@@ -7,6 +7,12 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
@@ -41,7 +47,7 @@ public class UplPanCon extends PanCon {
             UIManager.put("FileChooser.readOnly", old);
 
             chooser.setMultiSelectionEnabled(true);
-            
+
 //            // Adding filter
 //            chooser.setAcceptAllFileFilterUsed(false);
 //            chooser.addChoosableFileFilter(new FileFilter() {
@@ -62,32 +68,40 @@ public class UplPanCon extends PanCon {
 //                }
 //
 //            });
-
             // Show the dialog; wait until dialog is closed
             chooser.showDialog(theView, "Choisissez les fichiers à uploader");
 
             // Retrieve the selected files.
             File[] files = chooser.getSelectedFiles();
-            
+
+            // Converting to ArrayList
+            List<File> filesList = Arrays.asList(files);
+
+            // Sorting the list alphabetically in descending order
+            Collections.sort(filesList, new SortIgnoreCase());
+
             // Adding them to the model
-            for (File f : files) {
+            filesList.forEach(f -> {
+                
+                System.out.println("___adding " + f.getName());
                 theModel.addMedia(f);
-            }
-            
+
+            });
+
             theView.displayMediasInfo(theModel.getMedias());
-            
-            System.out.println("\n== asking for reload from controller");
+
+            System.out.println("\n___asking for reload from controller");
 
             needRefresh = true;
             refreshType = "reloadUploadPanel";
-          
+
             Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
-            
+
             thumbsWorker.execute();
-            
+
         }
     }
-    
+
     /**
      * Implementation of the deco button listener
      */
@@ -102,7 +116,7 @@ public class UplPanCon extends PanCon {
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
-            
+
             needRefresh = true;
             refreshType = "loadConnectionPanel";
 
@@ -127,12 +141,22 @@ public class UplPanCon extends PanCon {
         this.theView.addDecoButtonListener(new DecoButtonListener());
 
     }
-
     
+    /**
+     *  Utility class to sort files without looking at the case
+     */
+    public class SortIgnoreCase implements Comparator<File> {
+        @Override
+        public int compare(File o1, File o2) {
+            String s1 = o1.getName();
+            String s2 = o2.getName();
+            return s1.toLowerCase().compareTo(s2.toLowerCase());
+        }
+    }
+
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
-    
     @Override
     public void setNeedRefresh(Boolean b) {
         super.setNeedRefresh(b);
@@ -142,6 +166,5 @@ public class UplPanCon extends PanCon {
     public void setRefreshType(String s) {
         super.setRefreshType(s);
     }
-    
-   
+
 }

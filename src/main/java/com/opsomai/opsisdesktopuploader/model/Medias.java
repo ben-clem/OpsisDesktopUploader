@@ -64,7 +64,7 @@ public final class Medias {
 
                 // is the thumbnail generated
                 if (thumbnail.getIcon() == null) {
-                    System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is null --> starting creating one");
+                    System.out.println("\n_Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is null --> starting creating one");
 
                     try {
 
@@ -79,7 +79,7 @@ public final class Medias {
                     generatedThumbnails.add(thumbnail);
 
                 } else {
-                    System.out.println("\n-- Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
+                    System.out.println("\n_Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
                 }
 
             });
@@ -96,7 +96,7 @@ public final class Medias {
 
                 theView.addThumbnail(thumbnail);
 
-                System.out.println("\n== asking for reload from model");
+                System.out.println("\n_asking for reload from model");
 
                 theController.setNeedRefresh(true);
                 theController.setRefreshType("reloadUploadPanel");
@@ -120,7 +120,7 @@ public final class Medias {
 
             thumbnails = result;
 
-            System.out.println("Task finished");
+            System.out.println("_Task finished");
         }
 
     }
@@ -153,7 +153,7 @@ public final class Medias {
 
         // what type of file is it
         String mimetype = new MimetypesFileTypeMap().getContentType(media.getFile());
-        System.out.println("*** mimetype = " + mimetype);
+        System.out.println("_mimetype = " + mimetype);
 
         // Fixing missing MIME type
         if ("application/octet-stream".equals(mimetype)) {
@@ -162,9 +162,13 @@ public final class Medias {
 
             MimeTypesFixer fixer = new MimeTypesFixer();
 
-            mimetype = fixer.getMap().get(extension).toString();
-
-            System.out.println("*** Fixed missing mimetype = " + mimetype);
+            try {
+                mimetype = fixer.getMap().get(extension).toString();
+                System.out.println("_fixed missing mimetype = " + mimetype);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+                System.out.println("_unable to fix MIME type, keeping: " + mimetype);
+            }
         }
 
         String type = mimetype.split("/")[0];
@@ -175,7 +179,7 @@ public final class Medias {
 
             case "image":
 
-                System.out.println("It's an image, starting thumbnail creation");
+                System.out.println("_it's an image, starting thumbnail creation");
 
                 // Image scaling without loading into memory
                 // https://stackoverflow.com/questions/10817597/java-image-scaling-without-loading-the-whole-image-into-memory
@@ -203,7 +207,7 @@ public final class Medias {
 
             case "video":
                 // If it's a video
-                System.out.println("It's a video, starting thumbnail creation");
+                System.out.println("_it's a video, starting thumbnail creation");
 
                 FFmpegFrameGrabber g = new FFmpegFrameGrabber(media.getFile());
 
@@ -220,7 +224,7 @@ public final class Medias {
 
             default:
                 // Else --> generic file icon
-                System.out.println("It's any other file type, putting generic file icon");
+                System.out.println("_it's any other file type, putting generic file icon");
 
                 BufferedImage fileLogo = ImageIO.read(new FileInputStream("img/icons8-file-240.png"));
 
