@@ -27,7 +27,6 @@ public class OpsisDesktopUploader {
     ///////////////
     // ATTRIBUTS //
     ///////////////
-
     private Window win;
 
     private Boolean needRefresh;
@@ -44,6 +43,8 @@ public class OpsisDesktopUploader {
      * @param args
      */
     public static void main(String[] args) {
+
+        
 
         // Making the look and feel universal
         try {

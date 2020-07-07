@@ -372,5 +372,37 @@ public final class Medias {
     public ArrayList<Media> getMedias() {
         return this.medias;
     }
+    
+    public void dumpMedia(int index) {
+        
+        System.out.println("_dumping media n°" + index);
+        
+        // ! Might cause bugs (needs to be tested)
+        this.medias.remove(index);
+        this.thumbnails.remove(index);
+        
+        // Fixing indexes
+        medias.forEach( media -> {
+            if (media.getIndex() > index) {
+                media.setIndex(media.getIndex() - 1);
+            }
+        });
+        
+        thumbnails.forEach( thumbnail -> {
+            if (thumbnail.getIndex() > index) {
+                thumbnail.setIndex(thumbnail.getIndex() - 1);
+            }
+        });
+        
+    }
+    
+    public void dumpMedias() {
+        
+        System.out.println("_dumping all medias");
+        
+        this.medias.clear();
+        this.thumbnails.clear();
+        
+    }
 
 }

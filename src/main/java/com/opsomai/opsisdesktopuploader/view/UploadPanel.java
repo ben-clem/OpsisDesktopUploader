@@ -1,7 +1,6 @@
 package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
-import com.opsomai.opsisdesktopuploader.model.Medias;
 import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
@@ -53,6 +52,9 @@ public final class UploadPanel extends JPanel {
 
     private JButton deco;
     private JButton openButton;
+    private JButton start;
+    private JButton cancel;
+
     private JPanel filesPanel;
     private JScrollPane scrollPane;
 
@@ -80,6 +82,8 @@ public final class UploadPanel extends JPanel {
         this.add(box2, c7);
 
         JLabel topLabel = new JLabel("Connecté à la médiathèque : " + name + " (" + url + ")");
+        topLabel.setForeground(fg);
+
         GridBagConstraints c1 = new GridBagConstraints();
         //c1.fill = GridBagConstraints.HORIZONTAL;
         c1.gridx = 1;
@@ -152,6 +156,20 @@ public final class UploadPanel extends JPanel {
         filesPanel.setLayout(new BoxLayout(filesPanel, BoxLayout.PAGE_AXIS));
         filesPanel.setBackground(bg);
 
+        JLabel dropHere = new JLabel("Déposez vos fichiers ici");
+        dropHere.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        Font dropFont = dropHere.getFont();
+        Map dropFontAttributes = dropFont.getAttributes();
+        dropFontAttributes.put(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD);
+        dropFontAttributes.put(TextAttribute.SIZE, 24);
+        dropHere.setFont(dropFont.deriveFont(dropFontAttributes));
+        dropHere.setForeground(fg);
+
+        filesPanel.add(Box.createVerticalGlue());
+        filesPanel.add(dropHere);
+        filesPanel.add(Box.createVerticalGlue());
+
         scrollPane = new JScrollPane(filesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
@@ -173,7 +191,7 @@ public final class UploadPanel extends JPanel {
         c6.weightx = 0.3;
         this.add(box, c6);
 
-        JButton start = new JButton("Démarrer l'upload");
+        start = new JButton("Démarrer l'upload");
         GridBagConstraints c4 = new GridBagConstraints();
         c4.fill = GridBagConstraints.BOTH;
         c4.gridx = 1;
@@ -185,7 +203,7 @@ public final class UploadPanel extends JPanel {
         c4.insets = new Insets(5, 5, 10, 5);
         this.add(start, c4);
 
-        JButton cancel = new JButton();
+        cancel = new JButton();
 
         try {
             cancel = new JButton("Annuler", createImageIcon("img/icons8-delete-64.png"));
@@ -454,6 +472,48 @@ public final class UploadPanel extends JPanel {
         }
     }
 
+    public void emptyFilesPanel() {
+        filesPanel.removeAll();
+    }
+
+    public void removeFile(int index) {
+
+        int matchingIndex = index * 2 + 1;
+
+        filesPanel.remove(matchingIndex);
+        filesPanel.remove(matchingIndex - 1);
+
+        cancelMap.remove(index);
+
+        System.out.println("__removed file n°" + index);
+
+        // Fixing cancelMap indexes
+        Map<Integer, JButton> newMap = new HashMap<>();
+        
+        cancelMap.entrySet().forEach((entry) -> {
+            
+            System.out.println("__before: " + entry.getKey() + "/" + entry.getValue().getName());
+            
+            if (entry.getKey() > index) {
+                
+                int newKey = entry.getKey() - 1;
+                JButton newBut = entry.getValue();
+                newBut.setName(String.valueOf(newKey));
+                
+                newMap.put(newKey, newBut);
+                System.out.println("__after: " + newKey + "/" + newBut.getName());
+                
+            } else {
+                newMap.put(entry.getKey(), entry.getValue());
+                System.out.println("__after: " + entry.getKey() + "/" + entry.getValue().getName());
+            }
+            
+        });
+        
+        cancelMap = newMap;
+
+    }
+
     //////////////////////
     // ACTION LISTENERS //
     //////////////////////
@@ -487,6 +547,44 @@ public final class UploadPanel extends JPanel {
     public void addFileDropListener(FileDrop.Listener listenForFileDrop) {
 
         FileDrop fileDrop = new FileDrop(scrollPane, listenForFileDrop);
+
+    }
+
+    /**
+     * adds an ActionListener to the upload button
+     *
+     * @param listenForUploadButton ActionListener added by the controller
+     */
+    public void addUploadButtonListener(ActionListener listenForUploadButton) {
+
+        start.addActionListener(listenForUploadButton);
+
+    }
+
+    /**
+     * adds an ActionListener to each cancel button
+     *
+     * @param listenForCancelButtons ActionListener added by the controller
+     */
+    public void addCancelButtonsListeners(ActionListener listenForCancelButtons) {
+
+        cancelMap.forEach((index, button) -> {
+
+            button.addActionListener(listenForCancelButtons);
+            button.setName(String.valueOf(index));
+
+        });
+
+    }
+
+    /**
+     * adds an ActionListener to the cancel ALL button
+     *
+     * @param listenForCancelAllButton ActionListener added by the controller
+     */
+    public void addCancelAllButtonListener(ActionListener listenForCancelAllButton) {
+
+        cancel.addActionListener(listenForCancelAllButton);
 
     }
 

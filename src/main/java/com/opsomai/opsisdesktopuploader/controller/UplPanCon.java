@@ -2,7 +2,6 @@ package com.opsomai.opsisdesktopuploader.controller;
 
 import com.opsomai.opsisdesktopuploader.model.Medias;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
-import com.opsomai.opsisdesktopuploader.utility.FileDrop.Listener;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import org.openide.util.Exceptions;
@@ -93,6 +93,7 @@ public class UplPanCon extends PanCon {
                 theModel.sortAllByIndex();
 
                 theView.displayMediasInfo(theModel.getMedias());
+                theView.addCancelButtonsListeners(new CancelButtonListener());
 
                 System.out.println("\n___asking for reload from controller");
 
@@ -140,7 +141,6 @@ public class UplPanCon extends PanCon {
         public void filesDropped(java.io.File[] files) {
 
             // handle file drop
-            
             // Converting to ArrayList
             List<File> filesList = Arrays.asList(files);
 
@@ -159,6 +159,7 @@ public class UplPanCon extends PanCon {
             theModel.sortAllByIndex();
 
             theView.displayMediasInfo(theModel.getMedias());
+            theView.addCancelButtonsListeners(new CancelButtonListener());
 
             System.out.println("\n___asking for reload from controller");
 
@@ -171,6 +172,56 @@ public class UplPanCon extends PanCon {
 
         }   // end filesDropped
 
+    }
+
+    /**
+     * Implementation of the Upload button listener
+     */
+    class UploadButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            // TODO
+        }
+    }
+
+    /**
+     * Implementation of the Cancel button listener
+     */
+    class CancelButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            int index = Integer.parseInt(((JButton) e.getSource()).getName());
+
+            System.out.println("___cancel button " + index + " clicked");
+
+            theModel.dumpMedia(index);
+            theView.removeFile(index);
+
+            needRefresh = true;
+            refreshType = "reloadUploadPanel";
+
+        }
+    }
+
+    /**
+     * Implementation of the Cancel ALL button listener
+     */
+    class CancelAllButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            theModel.dumpMedias();
+            theView.emptyFilesPanel();
+
+            needRefresh = true;
+            refreshType = "reloadUploadPanel";
+
+        }
     }
 
     //////////////
@@ -190,6 +241,9 @@ public class UplPanCon extends PanCon {
         this.theView.addOpenButtonListener(new OpenButtonListener());
         this.theView.addDecoButtonListener(new DecoButtonListener());
         this.theView.addFileDropListener(new FileDropListener());
+
+        this.theView.addUploadButtonListener(new UploadButtonListener());
+        this.theView.addCancelAllButtonListener(new CancelAllButtonListener());
 
     }
 
