@@ -1,4 +1,4 @@
-package com.opsomai.opsisdesktopuploader.model;
+package com.opsomai.opsisdesktopuploader.utility;
 
 import java.util.HashMap;
 import java.util.Map;

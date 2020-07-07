@@ -7,6 +7,25 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.net.ssl.SSLContext;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.openide.util.Exceptions;
@@ -51,26 +70,89 @@ public class ConPanCon extends PanCon {
             } else {
 
                 // vérifier format ?
-                // connexion (requète recherche vide, try sinon popup)
-                // Save info in file (json)
-                JSONObject obj = new JSONObject();
-                obj.put("url", url);
-                obj.put("api-key", api);
-                obj.put("name", nom);
+                // CONNEXION (requète recherche vide, try sinon popup)
+                // Trust own CA and all self-signed certs
+                SSLContext sslcontext = null;
+                try {
+                    sslcontext = SSLContexts.custom()
+                            .loadTrustMaterial(new TrustSelfSignedStrategy())
+                            .build();
+                } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
 
-                try (FileWriter file = new FileWriter("connection-info.json")) {
-                    file.write(obj.toString());
-                    System.out.println("Successfully copied JSON Object to File...");
-                    System.out.println("\nJSON Object: " + obj);
-                } catch (Exception e) {
-                    e.printStackTrace(System.err);
+                // Allow TLSv1 protocol only
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                        sslcontext,
+                        new String[]{"TLSv1.2"},
+                        null,
+                        SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+
+                try (CloseableHttpClient httpclient = HttpClients.custom()
+                        .setSSLSocketFactory(sslsf)
+                        .build()) {
+
+                    HttpPost httpPost = new HttpPost("https://" + url + "/service.php?urlaction=recherche");
+
+                    List<NameValuePair> nvps = new ArrayList<>();
+                    nvps.add(new BasicNameValuePair("api_key", api));
+                    httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+
+                    System.out.println("Executing request " + httpPost.getRequestLine());
+
+                    // Getting the response
+                    try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
+
+                        HttpEntity entity = response.getEntity();
+                        String responseBody = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+
+                        System.out.println("----------------------------------------");
+                        System.out.println(response.getStatusLine());
+                        System.out.println("----------------------------------------");
+                        System.out.println(responseBody);
+                        System.out.println("----------------------------------------");
+
+                        // Handling response
+                        if ("<rsp stat=\"ko\"><message>Authentification failed".equals(responseBody.substring(0, 47))) {
+
+                            theView.popupError("Authentification failed");
+
+                        } else if ("<rsp stat='ok'>".equals(responseBody.substring(39, 54))) {
+
+                            // Fin connexion
+                            // Save info in file (json)
+                            JSONObject obj = new JSONObject();
+                            obj.put("url", url);
+                            obj.put("api-key", api);
+                            obj.put("name", nom);
+
+                            try (FileWriter file = new FileWriter("connection-info.json")) {
+                                file.write(obj.toString());
+                                System.out.println("Successfully copied JSON Object to File...");
+                                System.out.println("\nJSON Object: " + obj);
+                            } catch (Exception e) {
+                                e.printStackTrace(System.err);
+                            }
+
+                            // Set needRefresh and refreshType
+                            needRefresh = true;
+                            refreshType = "loadUploadPanel";
+
+                        } else {
+                            theView.popupError("Unknown response:\n"
+                                    + "--------------------\n"
+                                    + responseBody);
+                        }
+
+                        EntityUtils.consume(entity);
+                    }
+
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
 
             }
 
-            // Set needRefresh and refreshType
-            needRefresh = true;
-            refreshType = "loadUploadPanel";
         }
 
     }
@@ -126,7 +208,7 @@ public class ConPanCon extends PanCon {
                 }
             } else {
                 System.out.println("-- connection-info.json is empty");
-                
+
                 this.theView = theView;
                 // Connecting the action listener to the view
                 this.theView.addConnButtonListener(new ConnButtonListener());

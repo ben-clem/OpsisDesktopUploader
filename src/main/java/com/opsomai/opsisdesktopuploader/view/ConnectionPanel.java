@@ -63,9 +63,9 @@ public final class ConnectionPanel extends JPanel {
 
         // Title
         titleLabel = new JLabel("<html>Opsis Desktop Uploader<br>"
-                + "........................<br/>"
-                + "........................<br/>"
-                + "....................</html>", SwingConstants.CENTER);
+                + "<br/>"
+                + "<br/>"
+                + "</html>", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Helvetica Neue", Font.PLAIN, 15));
         titleLabel.setForeground(Color.BLACK);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -148,17 +148,6 @@ public final class ConnectionPanel extends JPanel {
     }
 
     /**
-     * adds an ActionListener to the ConnButton
-     *
-     * @param listenForConnButton ActionListener added by the controller
-     */
-    public void addConnButtonListener(ActionListener listenForConnButton) {
-
-        connButton.addActionListener(listenForConnButton);
-
-    }
-
-    /**
      * simple popup
      *
      * @param message
@@ -190,7 +179,21 @@ public final class ConnectionPanel extends JPanel {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
 
     }
-    
+
+    //////////////////////
+    // ACTION LISTENERS //
+    //////////////////////
+    /**
+     * adds an ActionListener to the ConnButton
+     *
+     * @param listenForConnButton ActionListener added by the controller
+     */
+    public void addConnButtonListener(ActionListener listenForConnButton) {
+
+        connButton.addActionListener(listenForConnButton);
+
+    }
+
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
@@ -222,10 +225,3 @@ public final class ConnectionPanel extends JPanel {
     }
 
 }
-
-
-
-
-
-
-

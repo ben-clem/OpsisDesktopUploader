@@ -2,8 +2,9 @@ package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
 import com.opsomai.opsisdesktopuploader.model.Medias;
-import com.opsomai.opsisdesktopuploader.model.MimeTypesFixer;
+import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
+import com.opsomai.opsisdesktopuploader.utility.FileDrop;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -453,6 +454,9 @@ public final class UploadPanel extends JPanel {
         }
     }
 
+    //////////////////////
+    // ACTION LISTENERS //
+    //////////////////////
     /**
      * adds an ActionListener to the open button
      *
@@ -475,6 +479,17 @@ public final class UploadPanel extends JPanel {
 
     }
 
+    /**
+     * adds an ActionListener for file dropping
+     *
+     * @param listenForFileDrop
+     */
+    public void addFileDropListener(FileDrop.Listener listenForFileDrop) {
+
+        FileDrop fileDrop = new FileDrop(scrollPane, listenForFileDrop);
+
+    }
+
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
@@ -484,15 +499,15 @@ public final class UploadPanel extends JPanel {
     public JButton getOpenButton() {
         return openButton;
     }
-    
+
     public JPanel getFilesPanel() {
         return filesPanel;
     }
-    
+
     public int getScrollBarVerticalPosition() {
         return scrollPane.getVerticalScrollBar().getValue();
     }
-    
+
     public void setScrollBarVerticalPosition(int position) {
         scrollPane.getVerticalScrollBar().setValue(position);
     }

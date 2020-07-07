@@ -1,13 +1,10 @@
 package com.opsomai.opsisdesktopuploader.model;
 
+import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.controller.UplPanCon;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
