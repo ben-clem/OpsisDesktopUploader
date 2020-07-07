@@ -1,6 +1,8 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
 import com.opsomai.opsisdesktopuploader.model.Medias;
+import com.opsomai.opsisdesktopuploader.utility.FileDrop;
+import com.opsomai.opsisdesktopuploader.utility.FileDrop.Listener;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -129,6 +131,48 @@ public class UplPanCon extends PanCon {
         }
     }
 
+    /**
+     * Implementation of the file drop listener
+     */
+    class FileDropListener implements FileDrop.Listener {
+
+        @Override
+        public void filesDropped(java.io.File[] files) {
+
+            // handle file drop
+            
+            // Converting to ArrayList
+            List<File> filesList = Arrays.asList(files);
+
+            // Sorting the list alphabetically in descending order
+            Collections.sort(filesList, new SortIgnoreCase());
+
+            // Adding them to the model
+            filesList.forEach(f -> {
+
+                System.out.println("___adding " + f.getName());
+                theModel.addMedia(f);
+
+            });
+
+            // Sorting all by index
+            theModel.sortAllByIndex();
+
+            theView.displayMediasInfo(theModel.getMedias());
+
+            System.out.println("\n___asking for reload from controller");
+
+            needRefresh = true;
+            refreshType = "reloadUploadPanel";
+
+            Medias.ThumbnailsWorker thumbsWorker = theModel.new ThumbnailsWorker();
+
+            thumbsWorker.execute();
+
+        }   // end filesDropped
+
+    }
+
     //////////////
     // METHODES //
     //////////////
@@ -145,6 +189,7 @@ public class UplPanCon extends PanCon {
         // Connecting action listeners
         this.theView.addOpenButtonListener(new OpenButtonListener());
         this.theView.addDecoButtonListener(new DecoButtonListener());
+        this.theView.addFileDropListener(new FileDropListener());
 
     }
 

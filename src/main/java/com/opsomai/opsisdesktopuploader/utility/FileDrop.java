@@ -1,3 +1,4 @@
+package com.opsomai.opsisdesktopuploader.utility;
 
 import java.awt.datatransfer.DataFlavor;
 import java.io.BufferedReader;
