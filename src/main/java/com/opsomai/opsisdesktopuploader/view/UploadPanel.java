@@ -546,7 +546,7 @@ public final class UploadPanel extends JPanel {
      */
     public void addFileDropListener(FileDrop.Listener listenForFileDrop) {
 
-        FileDrop fileDrop = new FileDrop(scrollPane, listenForFileDrop);
+        FileDrop fileDrop = new FileDrop(this, listenForFileDrop);
 
     }
 
