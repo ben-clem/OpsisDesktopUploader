@@ -148,17 +148,6 @@ public final class ConnectionPanel extends JPanel {
     }
 
     /**
-     * adds an ActionListener to the ConnButton
-     *
-     * @param listenForConnButton ActionListener added by the controller
-     */
-    public void addConnButtonListener(ActionListener listenForConnButton) {
-
-        connButton.addActionListener(listenForConnButton);
-
-    }
-
-    /**
      * simple popup
      *
      * @param message
@@ -190,7 +179,21 @@ public final class ConnectionPanel extends JPanel {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
 
     }
-    
+
+    //////////////////////
+    // ACTION LISTENERS //
+    //////////////////////
+    /**
+     * adds an ActionListener to the ConnButton
+     *
+     * @param listenForConnButton ActionListener added by the controller
+     */
+    public void addConnButtonListener(ActionListener listenForConnButton) {
+
+        connButton.addActionListener(listenForConnButton);
+
+    }
+
     ///////////////////////
     // GETTERS / SETTERS //
     ///////////////////////
@@ -222,10 +225,3 @@ public final class ConnectionPanel extends JPanel {
     }
 
 }
-
-
-
-
-
-
-

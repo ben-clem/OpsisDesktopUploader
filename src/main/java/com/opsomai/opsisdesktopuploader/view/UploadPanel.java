@@ -2,7 +2,7 @@ package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
 import com.opsomai.opsisdesktopuploader.model.Medias;
-import com.opsomai.opsisdesktopuploader.model.MimeTypesFixer;
+import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import java.awt.Color;
 import java.awt.Component;
@@ -453,6 +453,10 @@ public final class UploadPanel extends JPanel {
         }
     }
 
+    //////////////////////
+    // ACTION LISTENERS //
+    //////////////////////
+    
     /**
      * adds an ActionListener to the open button
      *

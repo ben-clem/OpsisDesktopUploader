@@ -1,5 +1,6 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
+import com.opsomai.opsisdesktopuploader.utility.OSValidator;
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import com.opsomai.opsisdesktopuploader.view.Window;
@@ -26,7 +27,6 @@ public class OpsisDesktopUploader {
     ///////////////
     // ATTRIBUTS //
     ///////////////
-    private String os;
 
     private Window win;
 

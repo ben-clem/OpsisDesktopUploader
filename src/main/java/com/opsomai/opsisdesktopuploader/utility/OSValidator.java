@@ -1,4 +1,4 @@
-package com.opsomai.opsisdesktopuploader.controller;
+package com.opsomai.opsisdesktopuploader.utility;
 
 public class OSValidator {
 
