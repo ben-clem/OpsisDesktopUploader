@@ -147,9 +147,12 @@ public class OpsisDesktopUploader {
 
                     case "loadUploadPanel":
 
+                        String api_key = panCon.getApiKey();
+                        String url = panCon.getUrl();
+                        
                         uploadPanel = new UploadPanel(panCon.getName(), panCon.getUrl());
 
-                        UplPanCon uplPanCon = new UplPanCon(uploadPanel);
+                        UplPanCon uplPanCon = new UplPanCon(uploadPanel, api_key, url);
 
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);
