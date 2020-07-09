@@ -201,6 +201,11 @@ public class UplPanCon extends PanCon {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            
+            theView.setEveryProgressToWaiting();
+            
+            needRefresh = true;
+            refreshType = "reloadUploadPanel";
 
             Medias.UploadWorker uploadWorker = theModel.new UploadWorker();
             uploadWorker.execute();

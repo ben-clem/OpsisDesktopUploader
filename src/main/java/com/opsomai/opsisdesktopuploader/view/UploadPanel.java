@@ -1,6 +1,7 @@
 package com.opsomai.opsisdesktopuploader.view;
 
 import com.opsomai.opsisdesktopuploader.model.Media;
+import com.opsomai.opsisdesktopuploader.model.ProgressPair;
 import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
@@ -310,6 +311,8 @@ public final class UploadPanel extends JPanel {
 
             // Progress Bar
             JProgressBar progressBar = new JProgressBar(0, 100);
+            progressBar.setMinimum(0);
+            progressBar.setMaximum(100);
             progressBar.setValue(0);
             progressBar.setString("En attente de validation");
             progressBar.setStringPainted(true);
@@ -421,8 +424,9 @@ public final class UploadPanel extends JPanel {
 
             // Progress Bar
             JProgressBar progressBar = progressMap.get(i);
-            progressBar.setValue(0);
-            progressBar.setString("En attente de validation");
+
+            
+
             progressBar.setStringPainted(true);
 
             progressBar.setMinimumSize(new Dimension(200, 20));
@@ -489,27 +493,27 @@ public final class UploadPanel extends JPanel {
 
         // Fixing cancelMap indexes
         Map<Integer, JButton> newMap = new HashMap<>();
-        
+
         cancelMap.entrySet().forEach((entry) -> {
-            
+
             System.out.println("__before: " + entry.getKey() + "/" + entry.getValue().getName());
-            
+
             if (entry.getKey() > index) {
-                
+
                 int newKey = entry.getKey() - 1;
                 JButton newBut = entry.getValue();
                 newBut.setName(String.valueOf(newKey));
-                
+
                 newMap.put(newKey, newBut);
                 System.out.println("__after: " + newKey + "/" + newBut.getName());
-                
+
             } else {
                 newMap.put(entry.getKey(), entry.getValue());
                 System.out.println("__after: " + entry.getKey() + "/" + entry.getValue().getName());
             }
-            
+
         });
-        
+
         cancelMap = newMap;
 
     }
@@ -609,14 +613,33 @@ public final class UploadPanel extends JPanel {
     public void setScrollBarVerticalPosition(int position) {
         scrollPane.getVerticalScrollBar().setValue(position);
     }
-    
-    public void setProgress(int progress) {
+
+    public void setEveryProgressToWaiting() {
         
         this.progressMap.forEach( (index, progressBar) -> {
-            
-            progressBar.setValue(progress);
-            
+            progressBar.setString("En attente");
         });
         
+        refreshMediasInfo();
+        
+    }
+    
+    public void setProgress(ProgressPair progress) {
+
+        this.progressMap.get(progress.getIndex()).setValue(progress.getProgress());
+        
+
+            switch (progress.getProgress()) {
+                case 0:
+                    this.progressMap.get(progress.getIndex()).setString("En attente de validation");
+                    break;
+                case 100:
+                    this.progressMap.get(progress.getIndex()).setString("Envoyé au serveur pour traitement");
+                    break;
+                default:
+                    this.progressMap.get(progress.getIndex()).setString(String.valueOf(progress.getProgress()) + "%");
+                    break;
+            }
+
     }
 }

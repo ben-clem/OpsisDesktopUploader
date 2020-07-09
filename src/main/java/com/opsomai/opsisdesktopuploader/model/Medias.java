@@ -160,7 +160,7 @@ public final class Medias {
     /**
      * SwingWorker threading agent for upload process
      */
-    public class UploadWorker extends SwingWorker<String, Integer> {
+    public class UploadWorker extends SwingWorker<String, ProgressPair> {
 
         public UploadWorker() {
             // Init
@@ -202,7 +202,35 @@ public final class Medias {
                 mulitEntiBuilder.addPart("api_key", new StringBody(api, ContentType.TEXT_PLAIN));
 
                 medias.forEach(media -> {
-                    mulitEntiBuilder.addPart("media[]", new FileBody(media.getFile()));
+                    MyFileBody fileBody = new MyFileBody(media.getFile());
+
+                    fileBody.setListener(new IStreamListener() {
+
+                        int progress = 0;
+                        double send = 0;
+                        double size = media.getFile().length();
+
+                        @Override
+                        public void counterChanged(int delta) {
+
+                            send += delta;
+                            progress = (int) (send / size * 100);
+                            
+//                            System.out.println("-------------------------------------------------");
+//                            System.out.println(media.getFile().getName() + " - delta : " + delta);
+//                            System.out.println(media.getFile().getName() + " - send : " + send);
+//                            System.out.println(media.getFile().getName() + " - size : " + size);
+//                            System.out.println(media.getFile().getName() + " - progress : " + progress);
+
+                            ProgressPair progressPair = new ProgressPair(media.getIndex(), progress);
+                            
+                            publish(progressPair);
+                            
+                        }
+                    });
+
+                    mulitEntiBuilder.addPart("media[]", fileBody);
+
                 });
 
                 HttpEntity formEntity = mulitEntiBuilder.build();
@@ -240,7 +268,7 @@ public final class Medias {
         }
 
         @Override
-        public void process(List<Integer> chunks) {
+        public void process(List<ProgressPair> chunks) {
 
             chunks.forEach(progress -> {
 
