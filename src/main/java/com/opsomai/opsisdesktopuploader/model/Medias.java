@@ -10,6 +10,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -20,9 +24,24 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
+import javax.net.ssl.SSLContext;
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.ParseException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.openide.util.Exceptions;
@@ -41,9 +60,15 @@ public final class Medias {
     private UploadPanel theView;
     private UplPanCon theController;
 
+    protected String url;
+    protected String api;
+
     ////////////////////
     // NESTED CLASSES //
     ////////////////////
+    /**
+     * SwingWorker threading agent for thumbnails creation
+     */
     public class ThumbnailsWorker extends SwingWorker<ArrayList<Thumbnail>, Thumbnail> {
 
         public ThumbnailsWorker() {
@@ -55,8 +80,6 @@ public final class Medias {
 
             ArrayList<Thumbnail> generatedThumbnails = new ArrayList<>();
 
-           
-            
             // Task
             medias.forEach(media -> {
 
@@ -80,15 +103,15 @@ public final class Medias {
 
                 } else {
                     System.out.println("\n_Thumbnail n°" + media.getIndex() + "(" + thumbnail.getIndex() + ") is already there");
-                
+
                     thumbnail = thumbnails.get(media.getIndex());
-                    
+
                     thumbnail.setIndex(media.getIndex());
-                    
+
                     publish(thumbnail);
-                    
+
                     generatedThumbnails.add(thumbnail);
-                    
+
                 }
 
             });
@@ -134,6 +157,158 @@ public final class Medias {
 
     }
 
+    /**
+     * SwingWorker threading agent for upload process
+     */
+    public class UploadWorker extends SwingWorker<String, ProgressPair> {
+
+        public UploadWorker() {
+            // Init
+        }
+
+        @Override
+        public String doInBackground() throws Exception {
+
+            String responseBody = null;
+
+            // Task
+            // CONNEXION API
+            // Trust own CA and all self-signed certs
+            SSLContext sslcontext = null;
+            try {
+                sslcontext = SSLContexts.custom()
+                        .loadTrustMaterial(new TrustSelfSignedStrategy())
+                        .build();
+            } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+            // Allow TLSv1.2 protocol only
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                    sslcontext,
+                    new String[]{"TLSv1.2"},
+                    null,
+                    SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+
+            // Building client
+            try (CloseableHttpClient httpclient = HttpClients.custom()
+                    .setSSLSocketFactory(sslsf)
+                    .build()) {
+
+                HttpPost httpPost = new HttpPost("https://" + url + "/service.php?urlaction=upload");
+
+                MultipartEntityBuilder mulitEntiBuilder = MultipartEntityBuilder.create();
+
+                mulitEntiBuilder.addPart("api_key", new StringBody(api, ContentType.TEXT_PLAIN));
+
+                medias.forEach(media -> {
+                    MyFileBody fileBody = new MyFileBody(media.getFile());
+
+                    fileBody.setListener(new IStreamListener() {
+
+                        int progress = 0;
+                        double send = 0;
+                        double size = media.getFile().length();
+
+                        @Override
+                        public void counterChanged(int delta) {
+
+                            send += delta;
+                            progress = (int) (send / size * 100);
+                            
+//                            System.out.println("-------------------------------------------------");
+//                            System.out.println(media.getFile().getName() + " - delta : " + delta);
+//                            System.out.println(media.getFile().getName() + " - send : " + send);
+//                            System.out.println(media.getFile().getName() + " - size : " + size);
+//                            System.out.println(media.getFile().getName() + " - progress : " + progress);
+
+                            ProgressPair progressPair = new ProgressPair(media.getIndex(), progress);
+                            
+                            publish(progressPair);
+                            
+                        }
+                    });
+
+                    mulitEntiBuilder.addPart("media[]", fileBody);
+
+                });
+
+                HttpEntity formEntity = mulitEntiBuilder.build();
+
+                httpPost.setEntity(formEntity);
+
+                // Setting progress tracking
+                //
+                //
+                //
+                // Executing and getting the response
+                System.out.println("Executing request " + httpPost.getRequestLine());
+
+                try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
+
+                    HttpEntity resEntity = response.getEntity();
+
+                    if (resEntity != null) {
+                        System.out.println("Response content length: " + resEntity.getContentLength());
+                        responseBody = EntityUtils.toString(resEntity, StandardCharsets.UTF_8);
+
+                    }
+
+                    EntityUtils.consume(resEntity);
+
+                    // Task end
+                }
+
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+            return responseBody;
+
+        }
+
+        @Override
+        public void process(List<ProgressPair> chunks) {
+
+            chunks.forEach(progress -> {
+
+                theView.setProgress(progress);
+
+                System.out.println("\n_asking for reload from model");
+
+                theController.setNeedRefresh(true);
+                theController.setRefreshType("reloadUploadPanel");
+
+            });
+
+        }
+
+        @Override
+        protected void done() {
+
+            try {
+
+                String result = get();
+
+                System.out.println("----------------------------------------");
+                System.out.println(result);
+                System.out.println("----------------------------------------");
+
+                // Handling response
+                // Set needRefresh and refreshType
+                theController.setNeedRefresh(true);
+                theController.setRefreshType("reloadUploadPanel");
+
+                System.out.println("_Task finished");
+
+            } catch (InterruptedException | ExecutionException | ParseException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+        }
+
+    }
+
     //////////////
     // METHODES //
     //////////////
@@ -142,11 +317,16 @@ public final class Medias {
      *
      * @param theView
      * @param theController
+     * @param api_key
+     * @param url
      */
-    public Medias(UploadPanel theView, UplPanCon theController) {
+    public Medias(UploadPanel theView, UplPanCon theController, String api_key, String url) {
 
         this.theView = theView;
         this.theController = theController;
+
+        this.api = api_key;
+        this.url = url;
     }
 
     /**
@@ -294,7 +474,7 @@ public final class Medias {
         ImageIcon icon = new ImageIcon(newImg);
 
         Thumbnail genThumb = new Thumbnail(media.getIndex(), icon);
-        
+
         System.out.println("_creating thumbnail: " + media.getIndex());
 
         // Fin
@@ -361,48 +541,48 @@ public final class Medias {
         this.thumbnails.add(thumbnail);
 
     }
-    
+
     public void sortAllByIndex() {
-        
+
         this.medias.sort(Comparator.comparing(Media::getIndex));
         this.thumbnails.sort(Comparator.comparing(Thumbnail::getIndex));
-        
+
     }
 
     public ArrayList<Media> getMedias() {
         return this.medias;
     }
-    
+
     public void dumpMedia(int index) {
-        
+
         System.out.println("_dumping media n°" + index);
-        
+
         // ! Might cause bugs (needs to be tested)
         this.medias.remove(index);
         this.thumbnails.remove(index);
-        
+
         // Fixing indexes
-        medias.forEach( media -> {
+        medias.forEach(media -> {
             if (media.getIndex() > index) {
                 media.setIndex(media.getIndex() - 1);
             }
         });
-        
-        thumbnails.forEach( thumbnail -> {
+
+        thumbnails.forEach(thumbnail -> {
             if (thumbnail.getIndex() > index) {
                 thumbnail.setIndex(thumbnail.getIndex() - 1);
             }
         });
-        
+
     }
-    
+
     public void dumpMedias() {
-        
+
         System.out.println("_dumping all medias");
-        
+
         this.medias.clear();
         this.thumbnails.clear();
-        
+
     }
 
 }
