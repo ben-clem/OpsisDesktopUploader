@@ -609,4 +609,14 @@ public final class UploadPanel extends JPanel {
     public void setScrollBarVerticalPosition(int position) {
         scrollPane.getVerticalScrollBar().setValue(position);
     }
+    
+    public void setProgress(int progress) {
+        
+        this.progressMap.forEach( (index, progressBar) -> {
+            
+            progressBar.setValue(progress);
+            
+        });
+        
+    }
 }
