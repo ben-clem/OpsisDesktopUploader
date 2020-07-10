@@ -29,7 +29,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -53,7 +55,7 @@ public final class UploadPanel extends JPanel {
 
     private JButton deco;
     private JButton openButton;
-    private JButton start;
+    private JButton start = new JButton("Démarrer l'upload");
     private JButton cancel;
 
     private JPanel filesPanel;
@@ -64,6 +66,9 @@ public final class UploadPanel extends JPanel {
     private Map<Integer, JLabel> typesMap = new HashMap<>();
     private Map<Integer, JProgressBar> progressMap = new HashMap<>();
     private Map<Integer, JButton> cancelMap = new HashMap<>();
+
+    private boolean everyProgressIs100 = false;
+    private JDialog waitingPopup;
 
     //////////////
     // METHODES //
@@ -192,7 +197,7 @@ public final class UploadPanel extends JPanel {
         c6.weightx = 0.3;
         this.add(box, c6);
 
-        start = new JButton("Démarrer l'upload");
+        
         GridBagConstraints c4 = new GridBagConstraints();
         c4.fill = GridBagConstraints.BOTH;
         c4.gridx = 1;
@@ -203,6 +208,7 @@ public final class UploadPanel extends JPanel {
         c4.weighty = 0.05;
         c4.insets = new Insets(5, 5, 10, 5);
         this.add(start, c4);
+        System.out.println("!!! but placed from view init method");
 
         cancel = new JButton();
 
@@ -425,8 +431,6 @@ public final class UploadPanel extends JPanel {
             // Progress Bar
             JProgressBar progressBar = progressMap.get(i);
 
-            
-
             progressBar.setStringPainted(true);
 
             progressBar.setMinimumSize(new Dimension(200, 20));
@@ -518,9 +522,109 @@ public final class UploadPanel extends JPanel {
 
     }
 
-    //////////////////////
-    // ACTION LISTENERS //
-    //////////////////////
+    public void disableButtons() {
+
+        deco.setEnabled(false);
+        openButton.setEnabled(false);
+        start.setEnabled(false);
+        cancel.setEnabled(false);
+
+        cancelMap.forEach((index, button) -> {
+            button.setEnabled(false);
+        });
+        
+        titlesMap.forEach((index, title) -> {
+            title.setEnabled(false);
+        });
+
+    }
+
+    public boolean isEveryProgress100() {
+
+        this.everyProgressIs100 = true;
+
+        progressMap.forEach((index, progressBar) -> {
+
+            if (progressBar.getValue() != 100) {
+                this.everyProgressIs100 = false;
+            }
+
+        });
+
+        return this.everyProgressIs100;
+
+    }
+
+    /**
+     * waiting popup
+     */
+    public void waitingPopup() {
+
+        ImageIcon loading = new ImageIcon("img/ajax-loader.gif");
+        
+        final JOptionPane optionPane = new JOptionPane("Upload en cours de finalisation...\n"
+                + "Veuillez patienter.",
+                JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, loading);
+
+        this.waitingPopup = new JDialog();
+        this.waitingPopup.setTitle("Message");
+        this.waitingPopup.setModal(true);
+
+        this.waitingPopup.setContentPane(optionPane);
+
+        this.waitingPopup.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        this.waitingPopup.pack();
+
+        this.waitingPopup.setLocationRelativeTo(this);
+        this.waitingPopup.setVisible(true);
+
+    }
+    
+    public void closeWaitingPopup() {
+        this.waitingPopup.setVisible(false);
+    }
+    
+    /**
+     * simple popup
+     *
+     * @param message
+     */
+    public void popup(String message) {
+
+        JOptionPane.showMessageDialog(this, message, "Message", JOptionPane.PLAIN_MESSAGE);
+
+    }
+    
+    public void switchUploadButton(ActionListener listenForNewUploadButton) {
+        
+        System.out.println("!!! but switch from view");
+        
+        this.remove(this.start);
+        
+        this.start = new JButton("Préparer un nouvel upload");
+        start.addActionListener(listenForNewUploadButton);
+        
+        GridBagConstraints c4 = new GridBagConstraints();
+        c4.fill = GridBagConstraints.BOTH;
+        c4.gridx = 1;
+        c4.gridy = 3;
+        c4.gridwidth = 1;
+        c4.gridheight = 1;
+        c4.weightx = 0.5;
+        c4.weighty = 0.05;
+        c4.insets = new Insets(5, 5, 10, 5);
+        this.add(start, c4);
+        
+        System.out.println("!!! but placed from view switch method");
+        
+        // Enabling deco button
+        this.deco.setEnabled(true);
+        
+    }
+
+//////////////////////
+// ACTION LISTENERS //
+//////////////////////
     /**
      * adds an ActionListener to the open button
      *
@@ -615,31 +719,30 @@ public final class UploadPanel extends JPanel {
     }
 
     public void setEveryProgressToWaiting() {
-        
-        this.progressMap.forEach( (index, progressBar) -> {
+
+        this.progressMap.forEach((index, progressBar) -> {
             progressBar.setString("En attente");
         });
-        
+
         refreshMediasInfo();
-        
+
     }
-    
+
     public void setProgress(ProgressPair progress) {
 
         this.progressMap.get(progress.getIndex()).setValue(progress.getProgress());
-        
 
-            switch (progress.getProgress()) {
-                case 0:
-                    this.progressMap.get(progress.getIndex()).setString("En attente de validation");
-                    break;
-                case 100:
-                    this.progressMap.get(progress.getIndex()).setString("Envoyé au serveur pour traitement");
-                    break;
-                default:
-                    this.progressMap.get(progress.getIndex()).setString(String.valueOf(progress.getProgress()) + "%");
-                    break;
-            }
+        switch (progress.getProgress()) {
+            case 0:
+                this.progressMap.get(progress.getIndex()).setString("En attente de validation");
+                break;
+            case 100:
+                this.progressMap.get(progress.getIndex()).setString("Envoyé au serveur pour traitement");
+                break;
+            default:
+                this.progressMap.get(progress.getIndex()).setString(String.valueOf(progress.getProgress()) + "%");
+                break;
+        }
 
     }
 }

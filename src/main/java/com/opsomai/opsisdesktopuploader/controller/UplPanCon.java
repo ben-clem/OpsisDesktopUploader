@@ -202,6 +202,7 @@ public class UplPanCon extends PanCon {
         @Override
         public void actionPerformed(ActionEvent e) {
             
+            theView.disableButtons();
             theView.setEveryProgressToWaiting();
             
             needRefresh = true;
@@ -212,6 +213,8 @@ public class UplPanCon extends PanCon {
 
         }
     }
+    
+    
 
     /**
      * Implementation of the Cancel button listener
