@@ -1,6 +1,5 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
-import com.opsomai.opsisdesktopuploader.model.Media;
 import com.opsomai.opsisdesktopuploader.model.Medias;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
@@ -9,33 +8,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.net.ssl.SSLContext;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.ssl.SSLContexts;
 import org.openide.util.Exceptions;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 /**
  * Upload Panel Controller
@@ -261,20 +241,23 @@ public class UplPanCon extends PanCon {
      * base constructor
      *
      * @param theView
+     * @param name
      * @param api_key
      * @param url
      */
-    public UplPanCon(UploadPanel theView, String api_key, String url) {
+    public UplPanCon(UploadPanel theView, String name, String api_key, String url) {
 
         this.theView = theView;
         this.theModel = new Medias(theView, this, api_key, url);
 
+        this.nom = name;
         this.api = api_key;
         this.url = url;
 
         // Connecting action listeners
         this.theView.addOpenButtonListener(new OpenButtonListener());
         this.theView.addDecoButtonListener(new DecoButtonListener());
+        System.out.println(">>>>>Adding file drop listener from Controller init method");
         this.theView.addFileDropListener(new FileDropListener());
 
         this.theView.addUploadButtonListener(new UploadButtonListener());

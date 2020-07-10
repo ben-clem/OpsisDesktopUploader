@@ -657,7 +657,7 @@ public final class UploadPanel extends JPanel {
         FileDrop fileDrop = new FileDrop(this, listenForFileDrop);
 
     }
-
+   
     /**
      * adds an ActionListener to the upload button
      *
