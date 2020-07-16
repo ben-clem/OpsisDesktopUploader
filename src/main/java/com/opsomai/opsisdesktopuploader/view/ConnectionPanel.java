@@ -45,7 +45,7 @@ public final class ConnectionPanel extends JPanel {
 
         // Logo
         try {
-            Image img = ImageIO.read(new FileInputStream("img/logo.jpg"));
+            Image img = ImageIO.read(new FileInputStream("src/main/resources/img/logo.jpg"));
             img = img.getScaledInstance(-1, 100, Image.SCALE_SMOOTH);
             ImageIcon logo = new ImageIcon(img);
             logoLabel = new JLabel();

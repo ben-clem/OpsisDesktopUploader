@@ -13,6 +13,7 @@ public class Media {
     private Integer index;
     private File file;
 
+    
     //////////////
     // METHODES //
     //////////////
