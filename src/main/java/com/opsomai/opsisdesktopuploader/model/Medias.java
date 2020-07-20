@@ -435,7 +435,7 @@ public final class Medias {
                 // Else --> generic file icon
                 System.out.println("_it's any other file type, putting generic file icon");
 
-                BufferedImage fileLogo = ImageIO.read(new FileInputStream("img/icons8-file-240.png"));
+                BufferedImage fileLogo = ImageIO.read(new FileInputStream("src/main/resources/img/icons8-file-240.png"));
 
                 img = fileLogo;
 

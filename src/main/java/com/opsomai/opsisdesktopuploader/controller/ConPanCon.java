@@ -126,7 +126,7 @@ public class ConPanCon extends PanCon {
                             obj.put("api-key", api);
                             obj.put("name", nom);
 
-                            try (FileWriter file = new FileWriter("connection-info.json")) {
+                            try (FileWriter file = new FileWriter("src/main/resources/connection-info.json")) {
                                 file.write(obj.toString());
                                 System.out.println("Successfully copied JSON Object to File...");
                                 System.out.println("\nJSON Object: " + obj);
@@ -174,7 +174,7 @@ public class ConPanCon extends PanCon {
         // JSON reader
         JSONParser parser = new JSONParser();
 
-        try (Reader reader = new FileReader("connection-info.json")) {
+        try (Reader reader = new FileReader("src/main/resources/connection-info.json")) {
 
             if (reader.ready()) {
                 JSONObject jsonObject = (JSONObject) parser.parse(reader);

@@ -82,7 +82,7 @@ public class OpsisDesktopUploader {
         // JSON reader
         JSONParser parser = new JSONParser();
 
-        try (Reader reader = new FileReader("connection-info.json")) {
+        try (Reader reader = new FileReader("src/main/resources/connection-info.json")) {
 
             if (reader.ready()) {
                 JSONObject jsonObject = (JSONObject) parser.parse(reader);

@@ -77,7 +77,7 @@
         
         <resources>
             <resource>
-                <directory>img</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
         
@@ -91,6 +91,7 @@
             
             <!-- 
             Plugin used for FAT JAR packaging (contains everything, executable via command line only)
+            /!\ Put all the ressources directly in the root folder (src/main/ressources/img/logo.jpg => logo.jpg)
             command: mvn package
             -->
             <!--
@@ -116,23 +117,37 @@
             </plugin>
             -->
             
+            <!-- 
+            Plugin used for macOS app packaging (.app / .dmg, wasn't able to add resources)
+            command: mvn package
+            -->
+            <!--
             <plugin>
                 <groupId>de.perdian.maven.plugins</groupId>
                 <artifactId>macosappbundler-maven-plugin</artifactId>
                 <version>1.9.0</version>
                 <configuration>
-                    
+
                     <plist>
                         <JVMMainClassName>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</JVMMainClassName>
                         <JVMVersion>11+</JVMVersion>
                     </plist>
-                    
-                    
+
+                    <dmg>
+                        <generate>true</generate>
+
+                        <additionalResources>
+                            <additionalResource>
+                                <directory>/src/main/resources</directory>
+                            </additionalResource>
+                        </additionalResources>
+                    </dmg>
+
                     <jdk>
                         <include>false</include>
                         <location>/Library/Java/JavaVirtualMachines/zulu-11.jdk</location>
                     </jdk>
-                    
+
                 </configuration>
                 <executions>
                     <execution>
@@ -140,6 +155,32 @@
                         <goals>
                             <goal>bundle</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+            
+            <plugin>
+                <groupId>io.github.fvarrui</groupId>
+                <artifactId>javapackager</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                        <configuration>
+                            <!-- mandatory -->
+                            <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
+                            <!-- optional -->
+                            <generateInstaller>false</generateInstaller>        
+                            <administratorRequired>false</administratorRequired>
+                            <platform>mac</platform>
+                            <additionalResources>
+                                <additionalResource>src/main/resources</additionalResource>
+                            </additionalResources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -5,6 +5,11 @@
   <artifactId>OpsisDesktopUploader</artifactId>
   <version>1.0</version>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -28,26 +33,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>sh.tak.appbundler</groupId>
-        <artifactId>appbundle-maven-plugin</artifactId>
-        <version>1.2.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>bundle</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
-          <jrePath>/Library/Java/JavaVirtualMachines/zulu-11.jdk</jrePath>
-          <generateDiskImageFile>true</generateDiskImageFile>
-          <bundleName>Installer</bundleName>
-          <iconFile>installer1024.icns</iconFile>
-        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -121,7 +121,7 @@ public class UplPanCon extends PanCon {
 
             try {
                 // clear JSON file
-                new FileWriter("connection-info.json", false).close();
+                new FileWriter("src/main/resources/connection-info.json", false).close();
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
