@@ -174,12 +174,17 @@
                             <!-- mandatory -->
                             <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
                             <!-- optional -->
-                            <generateInstaller>false</generateInstaller>        
+                            <bundleJre>true</bundleJre>
+                            <generateInstaller>true</generateInstaller>        
                             <administratorRequired>false</administratorRequired>
                             <platform>mac</platform>
                             <additionalResources>
                                 <additionalResource>src/main/resources</additionalResource>
                             </additionalResources>
+                            <useResourcesAsWorkingDir>true</useResourcesAsWorkingDir>
+                            <organizationName>Opsomai</organizationName>
+                            <organizationUrl>http://www.opsomai.com/</organizationUrl>
+                            <organizationEmail>info@opsomai.com</organizationEmail>
                         </configuration>
                     </execution>
                 </executions>

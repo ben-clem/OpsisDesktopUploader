@@ -1,5 +1,6 @@
 package com.opsomai.opsisdesktopuploader.view;
 
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -45,7 +46,7 @@ public final class ConnectionPanel extends JPanel {
 
         // Logo
         try {
-            Image img = ImageIO.read(new FileInputStream("src/main/resources/img/logo.jpg"));
+            Image img = ImageIO.read(new FileInputStream(Global.getWorkingDirPrefix() + "resources/img/logo.jpg"));
             img = img.getScaledInstance(-1, 100, Image.SCALE_SMOOTH);
             ImageIcon logo = new ImageIcon(img);
             logoLabel = new JLabel();

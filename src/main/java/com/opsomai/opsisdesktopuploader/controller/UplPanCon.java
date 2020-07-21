@@ -2,6 +2,7 @@ package com.opsomai.opsisdesktopuploader.controller;
 
 import com.opsomai.opsisdesktopuploader.model.Medias;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -121,7 +122,7 @@ public class UplPanCon extends PanCon {
 
             try {
                 // clear JSON file
-                new FileWriter("src/main/resources/connection-info.json", false).close();
+                new FileWriter(Global.getWorkingDirPrefix() + "resources/connection-info.json", false).close();
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }

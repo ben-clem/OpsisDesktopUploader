@@ -5,6 +5,7 @@ import com.opsomai.opsisdesktopuploader.model.ProgressPair;
 import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.model.Thumbnail;
 import com.opsomai.opsisdesktopuploader.utility.FileDrop;
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -122,7 +123,7 @@ public final class UploadPanel extends JPanel {
         try {
             // File Chooser
             openButton = new JButton("Select files...",
-                    createImageIcon("src/main/resources/img/Open16.gif"));
+                    createImageIcon(Global.getWorkingDirPrefix() + "resources/img/Open16.gif"));
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -213,7 +214,7 @@ public final class UploadPanel extends JPanel {
         cancel = new JButton();
 
         try {
-            cancel = new JButton("Annuler", createImageIcon("src/main/resources/img/icons8-delete-64.png"));
+            cancel = new JButton("Annuler", createImageIcon(Global.getWorkingDirPrefix() + "resources/img/icons8-delete-64.png"));
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -246,7 +247,7 @@ public final class UploadPanel extends JPanel {
             eachFilePanel.add(Box.createRigidArea(new Dimension(10, 10)));
 
             // Thumbnail loading icon (while separate thread is loading actual thumbnail)
-            ImageIcon loading = new ImageIcon("src/main/resources/img/ajax-loader.gif");
+            ImageIcon loading = new ImageIcon(Global.getWorkingDirPrefix() + "resources/img/ajax-loader.gif");
             final JLabel loadingLabel = new JLabel(loading, JLabel.CENTER);
             loadingLabel.setMinimumSize(new Dimension(100, 100));
             loadingLabel.setPreferredSize(new Dimension(100, 100));
@@ -336,7 +337,7 @@ public final class UploadPanel extends JPanel {
             // Cancel Button
             JButton cancelButton = new JButton();
             try {
-                cancelButton = new JButton(createImageIcon("src/main/resources/img/icons8-delete-64.png"));
+                cancelButton = new JButton(createImageIcon(Global.getWorkingDirPrefix() + "resources/img/icons8-delete-64.png"));
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -560,7 +561,7 @@ public final class UploadPanel extends JPanel {
      */
     public void waitingPopup() {
 
-        ImageIcon loading = new ImageIcon("src/main/resources/img/ajax-loader.gif");
+        ImageIcon loading = new ImageIcon(Global.getWorkingDirPrefix() + "resources/img/ajax-loader.gif");
         
         final JOptionPane optionPane = new JOptionPane("Upload en cours de finalisation...\n"
                 + "Veuillez patienter.",

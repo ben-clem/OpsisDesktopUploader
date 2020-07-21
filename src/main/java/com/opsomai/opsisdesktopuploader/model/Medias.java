@@ -2,6 +2,7 @@ package com.opsomai.opsisdesktopuploader.model;
 
 import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.controller.UplPanCon;
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -435,7 +436,7 @@ public final class Medias {
                 // Else --> generic file icon
                 System.out.println("_it's any other file type, putting generic file icon");
 
-                BufferedImage fileLogo = ImageIO.read(new FileInputStream("src/main/resources/img/icons8-file-240.png"));
+                BufferedImage fileLogo = ImageIO.read(new FileInputStream(Global.getWorkingDirPrefix() + "resources/img/icons8-file-240.png"));
 
                 img = fileLogo;
 
