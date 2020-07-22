@@ -171,20 +171,35 @@
                             <goal>package</goal>
                         </goals>
                         <configuration>
+                            
                             <!-- mandatory -->
                             <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
+                            
                             <!-- optional -->
-                            <bundleJre>true</bundleJre>
-                            <generateInstaller>true</generateInstaller>        
-                            <administratorRequired>false</administratorRequired>
-                            <platform>mac</platform>
+                            <name>Opsis Uploader</name>
+                            <displayName>Opsis Uploader</displayName>
+                            <organizationName>Opsomai</organizationName>
+                            <organizationUrl>http://www.opsomai.com/</organizationUrl>
+                            <organizationEmail>info@opsomai.com</organizationEmail>
+                            
                             <additionalResources>
                                 <additionalResource>src/main/resources</additionalResource>
                             </additionalResources>
                             <useResourcesAsWorkingDir>true</useResourcesAsWorkingDir>
-                            <organizationName>Opsomai</organizationName>
-                            <organizationUrl>http://www.opsomai.com/</organizationUrl>
-                            <organizationEmail>info@opsomai.com</organizationEmail>
+                            
+                            <bundleJre>true</bundleJre>
+                            <generateInstaller>true</generateInstaller>  
+                            
+                            <!--<platform>auto</platform>-->
+                            <platform>mac</platform>
+                            <!--<platform>linux</platform>-->
+                            <!--<platform>windows</platform>-->
+                            
+                            <macConfig>
+                                <generateDmg>true</generateDmg>
+                                <generatePkg>false</generatePkg>
+                            </macConfig>
+                            
                         </configuration>
                     </execution>
                 </executions>
