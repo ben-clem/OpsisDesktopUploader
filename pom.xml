@@ -89,77 +89,6 @@
                 <version>3.8.1</version>
             </plugin>
             
-            <!-- 
-            Plugin used for FAT JAR packaging (contains everything, executable via command line only)
-            /!\ Put all the ressources directly in the root folder (src/main/ressources/img/logo.jpg => logo.jpg)
-            command: mvn package
-            -->
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-            
-            <!-- 
-            Plugin used for macOS app packaging (.app / .dmg, wasn't able to add resources)
-            command: mvn package
-            -->
-            <!--
-            <plugin>
-                <groupId>de.perdian.maven.plugins</groupId>
-                <artifactId>macosappbundler-maven-plugin</artifactId>
-                <version>1.9.0</version>
-                <configuration>
-
-                    <plist>
-                        <JVMMainClassName>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</JVMMainClassName>
-                        <JVMVersion>11+</JVMVersion>
-                    </plist>
-
-                    <dmg>
-                        <generate>true</generate>
-
-                        <additionalResources>
-                            <additionalResource>
-                                <directory>/src/main/resources</directory>
-                            </additionalResource>
-                        </additionalResources>
-                    </dmg>
-
-                    <jdk>
-                        <include>false</include>
-                        <location>/Library/Java/JavaVirtualMachines/zulu-11.jdk</location>
-                    </jdk>
-
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-            
             <plugin>
                 <groupId>io.github.fvarrui</groupId>
                 <artifactId>javapackager</artifactId>
@@ -190,10 +119,9 @@
                             <bundleJre>true</bundleJre>
                             <generateInstaller>true</generateInstaller>  
                             
-                            <!--<platform>auto</platform>-->
-                            <platform>mac</platform>
-                            <!--<platform>linux</platform>-->
-                            <!--<platform>windows</platform>-->
+                            <!-- platform -->
+                            <platform>auto</platform>
+                            <!-- macOS / Windows / Linux : the target platform will be the same as the execution platform (required anyway) -->
                             
                             <macConfig>
                                 <generateDmg>true</generateDmg>
