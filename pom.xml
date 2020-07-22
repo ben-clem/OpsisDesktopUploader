@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.opsomai</groupId>
     <artifactId>OpsisDesktopUploader</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.netbeans.modules</groupId>
@@ -57,5 +61,151 @@
             <artifactId>httpmime</artifactId>
             <version>4.5.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
+    
+    <build>
+        
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        
+        <plugins>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+            
+            <!-- 
+            Plugin used for FAT JAR packaging (contains everything, executable via command line only)
+            /!\ Put all the ressources directly in the root folder (src/main/ressources/img/logo.jpg => logo.jpg)
+            command: mvn package
+            -->
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+            
+            <!-- 
+            Plugin used for macOS app packaging (.app / .dmg, wasn't able to add resources)
+            command: mvn package
+            -->
+            <!--
+            <plugin>
+                <groupId>de.perdian.maven.plugins</groupId>
+                <artifactId>macosappbundler-maven-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+
+                    <plist>
+                        <JVMMainClassName>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</JVMMainClassName>
+                        <JVMVersion>11+</JVMVersion>
+                    </plist>
+
+                    <dmg>
+                        <generate>true</generate>
+
+                        <additionalResources>
+                            <additionalResource>
+                                <directory>/src/main/resources</directory>
+                            </additionalResource>
+                        </additionalResources>
+                    </dmg>
+
+                    <jdk>
+                        <include>false</include>
+                        <location>/Library/Java/JavaVirtualMachines/zulu-11.jdk</location>
+                    </jdk>
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
+            
+            <plugin>
+                <groupId>io.github.fvarrui</groupId>
+                <artifactId>javapackager</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                        <configuration>
+                            
+                            <!-- mandatory -->
+                            <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
+                            
+                            <!-- optional -->
+                            <name>Opsis Uploader</name>
+                            <displayName>Opsis Uploader</displayName>
+                            <organizationName>Opsomai</organizationName>
+                            <organizationUrl>http://www.opsomai.com/</organizationUrl>
+                            <organizationEmail>info@opsomai.com</organizationEmail>
+                            
+                            <additionalResources>
+                                <additionalResource>src/main/resources</additionalResource>
+                            </additionalResources>
+                            <useResourcesAsWorkingDir>true</useResourcesAsWorkingDir>
+                            
+                            <bundleJre>true</bundleJre>
+                            <generateInstaller>true</generateInstaller>  
+                            
+                            <!--<platform>auto</platform>-->
+                            <platform>mac</platform>
+                            <!--<platform>linux</platform>-->
+                            <!--<platform>windows</platform>-->
+                            
+                            <macConfig>
+                                <generateDmg>true</generateDmg>
+                                <generatePkg>false</generatePkg>
+                            </macConfig>
+                            
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+        </plugins>
+    </build>
+    
 </project>

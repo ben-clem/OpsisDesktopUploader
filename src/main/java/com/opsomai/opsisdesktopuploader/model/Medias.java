@@ -2,9 +2,12 @@ package com.opsomai.opsisdesktopuploader.model;
 
 import com.opsomai.opsisdesktopuploader.utility.MimeTypesFixer;
 import com.opsomai.opsisdesktopuploader.controller.UplPanCon;
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,7 +39,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -62,6 +64,20 @@ public final class Medias {
 
     protected String url;
     protected String api;
+
+    /**
+     * Implementation of the NEW Upload button listener
+     */
+    class NewUploadButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            theController.setNeedRefresh(true);
+            theController.setRefreshType("loadUploadPanel");
+
+        }
+    }
 
     ////////////////////
     // NESTED CLASSES //
@@ -215,17 +231,16 @@ public final class Medias {
 
                             send += delta;
                             progress = (int) (send / size * 100);
-                            
+
 //                            System.out.println("-------------------------------------------------");
 //                            System.out.println(media.getFile().getName() + " - delta : " + delta);
 //                            System.out.println(media.getFile().getName() + " - send : " + send);
 //                            System.out.println(media.getFile().getName() + " - size : " + size);
 //                            System.out.println(media.getFile().getName() + " - progress : " + progress);
-
                             ProgressPair progressPair = new ProgressPair(media.getIndex(), progress);
-                            
+
                             publish(progressPair);
-                            
+
                         }
                     });
 
@@ -237,10 +252,6 @@ public final class Medias {
 
                 httpPost.setEntity(formEntity);
 
-                // Setting progress tracking
-                //
-                //
-                //
                 // Executing and getting the response
                 System.out.println("Executing request " + httpPost.getRequestLine());
 
@@ -281,6 +292,12 @@ public final class Medias {
 
             });
 
+            if (theView.isEveryProgress100()) {
+
+                theView.waitingPopup();
+
+            }
+
         }
 
         @Override
@@ -294,12 +311,18 @@ public final class Medias {
                 System.out.println(result);
                 System.out.println("----------------------------------------");
 
-                // Handling response
-                // Set needRefresh and refreshType
+                System.out.println("_Task finished");
+
+                theView.closeWaitingPopup();
+                theView.popup("Upload terminé avec succès !\n"
+                        + "Les fichiers ont été envoyés au serveur pour traitement.");
+
+                System.out.println("!!! asking for but switch from model");
+                theView.switchUploadButton(new NewUploadButtonListener());
+                
+                System.out.println("!!! asking for reload from model");
                 theController.setNeedRefresh(true);
                 theController.setRefreshType("reloadUploadPanel");
-
-                System.out.println("_Task finished");
 
             } catch (InterruptedException | ExecutionException | ParseException ex) {
                 Exceptions.printStackTrace(ex);
@@ -413,7 +436,7 @@ public final class Medias {
                 // Else --> generic file icon
                 System.out.println("_it's any other file type, putting generic file icon");
 
-                BufferedImage fileLogo = ImageIO.read(new FileInputStream("img/icons8-file-240.png"));
+                BufferedImage fileLogo = ImageIO.read(new FileInputStream(Global.getWorkingDirPrefix() + "resources/img/icons8-file-240.png"));
 
                 img = fileLogo;
 

@@ -1,5 +1,6 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import com.opsomai.opsisdesktopuploader.utility.OSValidator;
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
 import com.opsomai.opsisdesktopuploader.view.UploadPanel;
@@ -44,7 +45,10 @@ public class OpsisDesktopUploader {
      */
     public static void main(String[] args) {
 
-        
+        System.out.println("================================================================================");
+        System.out.println("Launching app with java:");
+        System.out.println(System.getProperty("java.version"));
+        System.out.println("================================================================================");
 
         // Making the look and feel universal
         try {
@@ -82,7 +86,7 @@ public class OpsisDesktopUploader {
         // JSON reader
         JSONParser parser = new JSONParser();
 
-        try (Reader reader = new FileReader("connection-info.json")) {
+        try (Reader reader = new FileReader(Global.getWorkingDirPrefix() + "resources/connection-info.json")) {
 
             if (reader.ready()) {
                 JSONObject jsonObject = (JSONObject) parser.parse(reader);
@@ -146,13 +150,14 @@ public class OpsisDesktopUploader {
                 switch (refreshType) {
 
                     case "loadUploadPanel":
-
+                        
+                        String name = panCon.getName();
                         String api_key = panCon.getApiKey();
                         String url = panCon.getUrl();
                         
                         uploadPanel = new UploadPanel(panCon.getName(), panCon.getUrl());
 
-                        UplPanCon uplPanCon = new UplPanCon(uploadPanel, api_key, url);
+                        UplPanCon uplPanCon = new UplPanCon(uploadPanel, name, api_key, url);
 
                         winCon.win.setContentPane(uploadPanel);
                         winCon.win.setVisible(true);

@@ -7,8 +7,6 @@ public class OSValidator {
 
     public static String getOSType() {
 
-        System.out.println(OS);
-
         if (isWindows()) {
             System.out.println("This is Windows");
             OSType = "Windows";
@@ -26,7 +24,7 @@ public class OSValidator {
             OSType = "Solaris";
 
         } else {
-            System.out.println("Your OS is not support!!");
+            System.out.println("Your OS is not supported!");
             OSType = "Unknown";
 
         }

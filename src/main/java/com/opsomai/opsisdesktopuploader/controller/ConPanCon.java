@@ -1,5 +1,6 @@
 package com.opsomai.opsisdesktopuploader.controller;
 
+import com.opsomai.opsisdesktopuploader.utility.Global;
 import com.opsomai.opsisdesktopuploader.view.ConnectionPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -126,7 +127,7 @@ public class ConPanCon extends PanCon {
                             obj.put("api-key", api);
                             obj.put("name", nom);
 
-                            try (FileWriter file = new FileWriter("connection-info.json")) {
+                            try (FileWriter file = new FileWriter(Global.getWorkingDirPrefix() + "resources/connection-info.json")) {
                                 file.write(obj.toString());
                                 System.out.println("Successfully copied JSON Object to File...");
                                 System.out.println("\nJSON Object: " + obj);
@@ -174,7 +175,7 @@ public class ConPanCon extends PanCon {
         // JSON reader
         JSONParser parser = new JSONParser();
 
-        try (Reader reader = new FileReader("connection-info.json")) {
+        try (Reader reader = new FileReader(Global.getWorkingDirPrefix() + "resources/connection-info.json")) {
 
             if (reader.ready()) {
                 JSONObject jsonObject = (JSONObject) parser.parse(reader);
