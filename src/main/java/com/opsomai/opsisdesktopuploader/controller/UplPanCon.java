@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
-import org.openide.util.Exceptions;
 
 /**
  * Upload Panel Controller
@@ -124,7 +123,7 @@ public class UplPanCon extends PanCon {
                 // clear JSON file
                 new FileWriter(Global.getWorkingDirPrefix() + "resources/connection-info.json", false).close();
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
             needRefresh = true;

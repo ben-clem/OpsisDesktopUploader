@@ -23,7 +23,7 @@ public class Window extends JFrame {
     public final void initWindow() {
 
         setTitle("Opsis Desktop Uploader");
-        setSize(960, 540);
+        setSize(1280, 720);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

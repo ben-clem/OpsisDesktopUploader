@@ -29,7 +29,6 @@ import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.openide.util.Exceptions;
 
 /**
  * Connection Panel Controller
@@ -79,7 +78,7 @@ public class ConPanCon extends PanCon {
                             .loadTrustMaterial(new TrustSelfSignedStrategy())
                             .build();
                 } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
-                    Exceptions.printStackTrace(ex);
+                    ex.printStackTrace(System.err);
                 }
 
                 // Allow TLSv1 protocol only
@@ -149,7 +148,7 @@ public class ConPanCon extends PanCon {
                     }
 
                 } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                    ex.printStackTrace(System.err);
                 }
 
             }
@@ -216,7 +215,7 @@ public class ConPanCon extends PanCon {
             }
 
         } catch (org.json.simple.parser.ParseException | IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace(System.err);
         }
 
     }

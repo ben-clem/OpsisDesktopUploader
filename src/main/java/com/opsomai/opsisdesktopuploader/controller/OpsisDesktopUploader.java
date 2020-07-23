@@ -18,7 +18,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultEditorKit;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.openide.util.Exceptions;
 
 /**
  * Controller de la fenêtre
@@ -112,7 +111,7 @@ public class OpsisDesktopUploader {
             }
 
         } catch (org.json.simple.parser.ParseException | IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace(System.err);
         }
 
         // Creating its controller

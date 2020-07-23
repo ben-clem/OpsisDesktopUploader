@@ -44,9 +44,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
-import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.Java2DFrameConverter;
-import org.openide.util.Exceptions;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.model.Picture;
+import org.jcodec.scale.AWTUtil;
 
 /**
  * Classe médias package model
@@ -110,7 +111,7 @@ public final class Medias {
                         thumbnail = createThumbnail(media);
 
                     } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
+                        ex.printStackTrace(System.err);
                     }
 
                     publish(thumbnail);
@@ -163,7 +164,7 @@ public final class Medias {
                 result = get();
 
             } catch (InterruptedException | ExecutionException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
             thumbnails = result;
@@ -196,7 +197,7 @@ public final class Medias {
                         .loadTrustMaterial(new TrustSelfSignedStrategy())
                         .build();
             } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
             // Allow TLSv1.2 protocol only
@@ -271,7 +272,7 @@ public final class Medias {
                 }
 
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
             return responseBody;
@@ -319,13 +320,13 @@ public final class Medias {
 
                 System.out.println("!!! asking for but switch from model");
                 theView.switchUploadButton(new NewUploadButtonListener());
-                
+
                 System.out.println("!!! asking for reload from model");
                 theController.setNeedRefresh(true);
                 theController.setRefreshType("reloadUploadPanel");
 
             } catch (InterruptedException | ExecutionException | ParseException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
         }
@@ -419,17 +420,25 @@ public final class Medias {
                 // If it's a video
                 System.out.println("_it's a video, starting thumbnail creation");
 
-                FFmpegFrameGrabber g = new FFmpegFrameGrabber(media.getFile());
+                try {
+                    // Get the first keyframe / frame
 
-                g.start();
+                    Picture picture = FrameGrab.getFrameFromFile(media.getFile(), 1);
 
-                Java2DFrameConverter c = new Java2DFrameConverter();
+                    //for JDK (jcodec-javase)
+                    img = AWTUtil.toBufferedImage(picture);
 
-                img = c.convert(g.grabKeyFrame());
+                } catch (IOException | JCodecException e) {
 
-                g.stop();
+                    e.printStackTrace(System.err);
 
-                // TODO: if unable to get keyFrame -> put genreic video logo
+                    // TODO: if unable to get keyFrame -> put generic video logo
+                    BufferedImage fileLogo = ImageIO.read(new FileInputStream(Global.getWorkingDirPrefix() + "resources/img/icons8-video-100.png"));
+
+                    img = fileLogo;
+
+                }
+
                 break;
 
             default:
@@ -450,50 +459,7 @@ public final class Medias {
 
         Image newImg = img.getScaledInstance((int) newDim.getWidth(), (int) newDim.getHeight(), Image.SCALE_SMOOTH);
 
-//
-//      Abandonned because wasn't pretty and made the thumbnail off-centered      
-//
-//        if ("video".equals(type)) {
-//
-//            // Adding a video logo to the video thumbnail
-//            // Converting the resized image to a buffered image for logo application
-//            // Create a buffered image with transparency
-//            BufferedImage bimage = new BufferedImage(newImg.getWidth(null), newImg.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-//
-//            // Draw the image on to the buffered image
-//            Graphics2D bGr = bimage.createGraphics();
-//            bGr.drawImage(newImg, 0, 0, null);
-//            bGr.dispose();
-//            // bimage is the converted BufferedImage to use next
-//
-//            // Loading Logo
-//            BufferedImage videoLogo = ImageIO.read(new FileInputStream("img/icons8-video-100.png"));
-//
-//            // Scaling down
-//            BufferedImage after = new BufferedImage(videoLogo.getWidth(), videoLogo.getHeight(), BufferedImage.TYPE_INT_ARGB);
-//            AffineTransform at = new AffineTransform();
-//            at.scale(0.35, 0.35);
-//            AffineTransformOp scaleOp
-//                    = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-//            after = scaleOp.filter(videoLogo, after);
-//
-//            // Applying the logo
-//            // create the new image, canvas size is the max. of both image sizes
-//            int w = Math.max(bimage.getWidth(), after.getWidth());
-//            int h = Math.max(bimage.getHeight(), after.getHeight());
-//            BufferedImage combined = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//
-//            // paint both images, preserving the alpha channels
-//            Graphics g = combined.getGraphics();
-//            g.drawImage(bimage, 0, 0, null);
-//            g.drawImage(after, 0, 0, null);
-//
-//            g.dispose();
-//
-//            newImg = combined;
-//
-//        }
-//
+
         ImageIcon icon = new ImageIcon(newImg);
 
         Thumbnail genThumb = new Thumbnail(media.getIndex(), icon);
