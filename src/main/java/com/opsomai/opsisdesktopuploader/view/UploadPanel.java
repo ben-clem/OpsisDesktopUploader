@@ -38,7 +38,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.apache.commons.io.FilenameUtils;
-import org.openide.util.Exceptions;
 
 /**
  * Upload Screen
@@ -125,7 +124,7 @@ public final class UploadPanel extends JPanel {
             openButton = new JButton("Select files...",
                     createImageIcon(Global.getWorkingDirPrefix() + "resources/img/Open16.gif"));
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace(System.err);
         }
 
         choicePanel.add(openButton);
@@ -216,7 +215,7 @@ public final class UploadPanel extends JPanel {
         try {
             cancel = new JButton("Annuler", createImageIcon(Global.getWorkingDirPrefix() + "resources/img/icons8-delete-64.png"));
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace(System.err);
         }
 
         GridBagConstraints c5 = new GridBagConstraints();
@@ -339,7 +338,7 @@ public final class UploadPanel extends JPanel {
             try {
                 cancelButton = new JButton(createImageIcon(Global.getWorkingDirPrefix() + "resources/img/icons8-delete-64.png"));
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                ex.printStackTrace(System.err);
             }
 
             cancelButton.setMinimumSize(new Dimension(20, 20));
