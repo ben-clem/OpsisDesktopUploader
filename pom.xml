@@ -95,7 +95,7 @@
                             <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
                             
                             <!-- package version -->
-                            <version>1.1_macOS</version>
+                            <version>1.1_win</version>
                             
                             <!-- optional -->
                             <name>Opsis Uploader</name>
@@ -120,6 +120,15 @@
                                 <generateDmg>true</generateDmg>
                                 <generatePkg>false</generatePkg>
                             </macConfig>
+                            
+                            <winConfig>
+                                <generateSetup>true</generateSetup>
+                                <generateMsi>false</generateMsi>
+                                <copyright>Opsomai</copyright>
+                                <language>Français</language>
+                                <disableFinishedPage>false</disableFinishedPage>
+                                <createDesktopIconTask>true</createDesktopIconTask>
+                            </winConfig>
                             
                         </configuration>
                     </execution>

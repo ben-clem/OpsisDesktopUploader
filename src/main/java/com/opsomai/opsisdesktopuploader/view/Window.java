@@ -1,5 +1,8 @@
 package com.opsomai.opsisdesktopuploader.view;
 
+import com.opsomai.opsisdesktopuploader.utility.Global;
+import java.awt.Image;
+import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 /**
@@ -21,6 +24,9 @@ public class Window extends JFrame {
      * initialisation de la fenêtre
      */
     public final void initWindow() {
+        
+        Image icon = Toolkit.getDefaultToolkit().getImage(Global.getWorkingDirPrefix() + "resources/img/appLogo.png");  
+        setIconImage(icon);
 
         setTitle("Opsis Desktop Uploader");
         setSize(1280, 720);
