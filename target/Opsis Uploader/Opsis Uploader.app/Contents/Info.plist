@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>CFBundleGetInfoString</key>
+		<string>Opsis Uploader 1.1_macOS</string>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>English</string>
+		<key>CFBundleExecutable</key>
+		<string>startup</string>
+		<key>CFBundleIconFile</key>
+		<string>Opsis Uploader.icns</string>
+		<key>CFBundleIdentifier</key>
+		<string>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</string>
+		<key>CFBundleDisplayName</key>
+		<string>Opsis Uploader</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>Opsis Uploader</string>
+		<key>CFBundlePackageType</key>
+		<string>BNDL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>1.1_macOS</string>
+		<key>CFBundleSignature</key>
+		<string>Opsomai ©2016</string>
+		<key>CFBundleVersion</key>
+		<string>1.1_macOS</string>
+		<key>NSHumanReadableCopyright</key>
+		<string>Opsomai</string>
+		<key>NSHighResolutionCapable</key>
+		<true />
+		<key>NSSupportsAutomaticGraphicsSwitching</key>
+		<true />
+		<key>AdministratorRequired</key>
+		<false />
+		<key>JavaX</key>
+		<dict>
+			<key>WorkingDirectory</key>
+			<string>$APP_PACKAGE/Contents/Resources</string>
+			<key>ClassPath</key>
+			<string>Java/Opsis Uploader-1.1_macOS-runnable.jar</string>
+			<key>MainClass</key>
+			<string>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</string>
+		</dict>
+		<key>LSEnvironment</key>
+		<dict>
+			<key>JAVA_HOME</key>
+			<string>Contents/PlugIns/jre/Contents/Home</string>
+		</dict>
+		<key>NSAppleEventsUsageDescription</key>
+		<string>There was an error while launching the application. Please
+			click OK to display a dialog with more information or cancel and view
+			the syslog for details.</string>
+	</dict>
+</plist>
