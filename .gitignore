@@ -1,3 +1,7 @@
 target/classes/.netbeans_automatic_build
 target/test-classes/.netbeans_automatic_build
-/target/
+
+*.DS_Store
+
+
+target/Opsis Uploader/.background/background.png

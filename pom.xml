@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.opsomai</groupId>
     <artifactId>OpsisDesktopUploader</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -94,6 +94,9 @@
                             <!-- mandatory -->
                             <mainClass>com.opsomai.opsisdesktopuploader.controller.OpsisDesktopUploader</mainClass>
                             
+                            <!-- package version -->
+                            <version>1.1_win</version>
+                            
                             <!-- optional -->
                             <name>Opsis Uploader</name>
                             <displayName>Opsis Uploader</displayName>
@@ -117,6 +120,15 @@
                                 <generateDmg>true</generateDmg>
                                 <generatePkg>false</generatePkg>
                             </macConfig>
+                            
+                            <winConfig>
+                                <generateSetup>true</generateSetup>
+                                <generateMsi>false</generateMsi>
+                                <copyright>Opsomai</copyright>
+                                <language>Français</language>
+                                <disableFinishedPage>false</disableFinishedPage>
+                                <createDesktopIconTask>true</createDesktopIconTask>
+                            </winConfig>
                             
                         </configuration>
                     </execution>
